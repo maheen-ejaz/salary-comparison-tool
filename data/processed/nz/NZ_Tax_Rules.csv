@@ -1,0 +1,8 @@
+Country,Region,Tax_Type,Income_Bracket_Lower,Income_Bracket_Upper,Rate_Percent,Notes,Source,Last_Verified,Estimation_Flag
+NZ,National,Income Tax,0,14000,10.5,"First tax bracket - lowest rate for income up to NZ$14,000","IRD (Inland Revenue Department) - 2025-2026 tax rates",2026-02-19,N
+NZ,National,Income Tax,14001,48000,17.5,"Second bracket - applies to income between NZ$14,001 and NZ$48,000","IRD (Inland Revenue Department) - 2025-2026 tax rates",2026-02-19,N
+NZ,National,Income Tax,48001,70000,30,"Third bracket - applies to income between NZ$48,001 and NZ$70,000","IRD (Inland Revenue Department) - 2025-2026 tax rates",2026-02-19,N
+NZ,National,Income Tax,70001,180000,33,"Fourth bracket - applies to income between NZ$70,001 and NZ$180,000. Most doctors fall in this bracket.","IRD (Inland Revenue Department) - 2025-2026 tax rates",2026-02-19,N
+NZ,National,Income Tax,180001,999999999,39,"Top bracket - applies to income over NZ$180,000. Applicable to senior consultants and specialists.","IRD (Inland Revenue Department) - 2025-2026 tax rates",2026-02-19,N
+NZ,National,ACC Earners Levy,0,152790,1.67,"Accident Compensation Corporation levy for workplace injury insurance. Rate applies to maximum liable earnings of NZ$152,790. Medical professionals typically at standard rate.","ACC Levy Rates 2025-2026",2026-02-19,N
+NZ,National,KiwiSaver,0,999999999,3,"Optional retirement savings scheme - 3% minimum employee contribution (4%, 6%, 8%, 10% also available). Employer contributes matching 3% (not shown in tax deductions). Many doctors opt in for retirement savings.","KiwiSaver Act 2006 - Current rates",2026-02-19,N

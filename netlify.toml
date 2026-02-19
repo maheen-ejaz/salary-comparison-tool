@@ -1,0 +1,19 @@
+[build]
+  base = "."
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/nextjs/:splat"
+  status = 200
+
+[functions]
+  node_bundler = "esbuild"
+  external_node_modules = ["sharp"]

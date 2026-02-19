@@ -1,0 +1,2 @@
+Currency_Pair,Base_Currency,Quote_Currency,Exchange_Rate,Rate_To_INR,Source,Last_Updated,Notes
+AED/INR,AED,INR,24.70,24.70,ExchangeRate-API (mid-market rate),2026-02-19,Mid-market rate; update monthly

@@ -1,0 +1,2 @@
+Country,Region,Tax_Type,Income_Bracket_Lower,Income_Bracket_Upper,Rate_Percent,Notes,Source,Last_Verified,Estimation_Flag
+AE,,Income Tax,0,999999999,0,"No personal income tax for expatriates. UAE nationals contribute 5% employee social security and 12.5% employer contribution; expatriates are exempt from all social security contributions. Health insurance is mandatory for all UAE visa holders as of 2025 (typically employer-sponsored).",UAE Ministry of Economy,2026-02-19,N

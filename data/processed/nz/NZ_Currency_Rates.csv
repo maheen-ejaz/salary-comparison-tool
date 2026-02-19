@@ -1,0 +1,2 @@
+Currency_Pair,Base_Currency,Quote_Currency,Exchange_Rate,Rate_To_INR,Source,Last_Updated,Notes
+NZD/INR,NZD,INR,54.47,54.47,ExchangeRate-API (mid-market rate),2026-02-18,"Mid-market exchange rate for New Zealand Dollar to Indian Rupee. Updated monthly. Use live rates in production for accurate comparisons."

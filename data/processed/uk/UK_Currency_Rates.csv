@@ -1,0 +1,2 @@
+Currency_Pair,Base_Currency,Quote_Currency,Exchange_Rate,Rate_To_INR,Source,Last_Updated,Notes
+GBP/INR,GBP,INR,123.60,123.60,ExchangeRate-API (api.exchangerate-api.com) - mid-market rate,2026-02-17,Mid-market interbank rate. Actual bank/transfer rates will include a margin. Update monthly or integrate live API (open.er-api.com) in web tool with this as fallback.
