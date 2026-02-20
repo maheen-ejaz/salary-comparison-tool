@@ -1,5 +1,5 @@
 import type { CountryData, LifestyleLevel, RentType } from "@/lib/data/types";
-import { COUNTRIES } from "@/lib/config/countries";
+import { COUNTRIES, type CountryConfig } from "@/lib/config/countries";
 import { findEquivalentStage, REPRESENTATIVE_CITY } from "@/lib/config/careerStageMapping";
 import { calculateUkTakeHome } from "@/lib/calc/uk/taxCalculator";
 import { calculateAuTakeHome } from "@/lib/calc/au/taxCalculator";
@@ -23,6 +23,7 @@ export interface ComparisonRow {
   cityLabel: string;
   lifestyleLabel: string;
   rentTypeLabel: string;
+  dataUnavailable?: boolean;
 }
 
 /** Tax calculators keyed by country code */
@@ -55,6 +56,26 @@ function pickGross(band: { grossAnnualMin: number; grossAnnualTypical: number; g
   if (point === "min") return band.grossAnnualMin;
   if (point === "max") return band.grossAnnualMax;
   return band.grossAnnualTypical;
+}
+
+function buildFallbackRow(country: CountryConfig): ComparisonRow {
+  return {
+    countryCode: country.code,
+    countryName: country.name,
+    flag: country.flag,
+    available: true,
+    currencySymbol: country.currencySymbol,
+    monthlyTakeHomeLocal: 0,
+    monthlyTakeHomeInr: 0,
+    monthlySavingsInr: 0,
+    isNegativeSavings: false,
+    recoveryMonthsTypical: Infinity,
+    isCurrentCountry: false,
+    cityLabel: REPRESENTATIVE_CITY[country.code] || "",
+    lifestyleLabel: "",
+    rentTypeLabel: "",
+    dataUnavailable: true,
+  };
 }
 
 export function computeComparisonRows(input: ComputeInput): ComparisonRow[] {
@@ -96,7 +117,10 @@ export function computeComparisonRows(input: ComputeInput): ComparisonRow[] {
 
     const data = allCountryData[country.code];
     const rate = allRates[country.code];
-    if (!data || !rate) continue;
+    if (!data || !rate) {
+      rows.push(buildFallbackRow(country));
+      continue;
+    }
 
     const isCurrentCountry = country.code === currentCountry;
 
@@ -129,7 +153,10 @@ export function computeComparisonRows(input: ComputeInput): ComparisonRow[] {
 
     // --- Other country: map career stage, compute from scratch ---
     const mappedStage = findEquivalentStage(currentCountry, currentCareerStage, country.code);
-    if (!mappedStage) continue;
+    if (!mappedStage) {
+      rows.push(buildFallbackRow(country));
+      continue;
+    }
 
     // Find salary band: public/government sector, mapped stage
     const band = data.salaryBands.find(
@@ -137,13 +164,19 @@ export function computeComparisonRows(input: ComputeInput): ComparisonRow[] {
              (b.sector.toLowerCase().includes("public") ||
               b.sector.toLowerCase().includes("government")),
     );
-    if (!band) continue;
+    if (!band) {
+      rows.push(buildFallbackRow(country));
+      continue;
+    }
 
     const gross = pickGross(band, currentSalaryPoint);
 
     // Compute tax
     const calculator = TAX_CALCULATORS[country.code];
-    if (!calculator) continue;
+    if (!calculator) {
+      rows.push(buildFallbackRow(country));
+      continue;
+    }
     const { netMonthly } = calculator(gross, data.taxRules);
 
     // Find CoL: representative city, same lifestyle & rent as user's selection

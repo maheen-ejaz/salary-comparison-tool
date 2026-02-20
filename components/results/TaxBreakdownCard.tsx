@@ -20,8 +20,8 @@ export function TaxBreakdownCard({ breakdown, selectedCity }: Props) {
   ];
 
   return (
-    <div className="rounded-2xl p-6 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-      <h2 className="text-lg font-bold mb-5" style={{ color: "var(--primary-900)" }}>
+    <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
+      <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
         2. Tax Breakdown
       </h2>
 

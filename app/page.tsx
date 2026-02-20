@@ -15,7 +15,7 @@ export default function LandingPage() {
             GC
           </div>
           <span className="text-white font-semibold text-lg tracking-tight">
-            GCWorld Salary Comparison Tool
+            Salary Comparison Tool by GooCampus World
           </span>
         </div>
       </header>
@@ -47,7 +47,7 @@ export default function LandingPage() {
               <Link
                 key={country.code}
                 href={`/${country.code}`}
-                className="group relative rounded-2xl p-6 text-left transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 bg-white"
+                className="group relative rounded-2xl p-8 text-left transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 bg-white"
                 style={{ border: "1.5px solid var(--primary-200)" }}
               >
                 <div className="text-4xl mb-3">{country.flag}</div>
@@ -68,7 +68,7 @@ export default function LandingPage() {
             ) : (
               <div
                 key={country.code}
-                className="relative rounded-2xl p-6 text-left"
+                className="relative rounded-2xl p-8 text-left"
                 style={{ background: "var(--neutral-100)", border: "1.5px solid var(--neutral-200)" }}
               >
                 <div className="text-4xl mb-3" style={{ filter: "grayscale(1)" }}>{country.flag}</div>
@@ -108,7 +108,7 @@ export default function LandingPage() {
             ].map((item) => (
               <div
                 key={item.title}
-                className="bg-white rounded-xl p-5"
+                className="bg-white rounded-xl p-6"
                 style={{ border: "1px solid var(--primary-200)" }}
               >
                 <div className="text-2xl mb-2">{item.icon}</div>
@@ -126,7 +126,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="py-8 px-6 text-center text-sm" style={{ color: "var(--neutral-400)" }}>
-        <p>GCWorld Salary Comparison Tool · Free forever · For planning purposes only</p>
+        <p>Salary Comparison Tool by GooCampus World · Free forever · For planning purposes only</p>
         <p className="mt-1">
           Data verified Feb 2026. Always verify with official sources before making decisions.
         </p>

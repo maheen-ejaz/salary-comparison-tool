@@ -13,7 +13,7 @@ export function TakeHomeCard({ breakdown, liveRate }: Props) {
 
   return (
     <div
-      className="rounded-2xl p-6"
+      className="rounded-2xl p-8"
       style={{ background: "var(--primary-900)", border: "1px solid var(--primary-700)" }}
     >
       <h2 className="text-lg font-bold mb-1 text-white">Monthly Take-Home</h2>

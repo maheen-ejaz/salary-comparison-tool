@@ -4,6 +4,8 @@ import type { SalaryBand } from "@/lib/data/types";
 import type { CountryConfig } from "@/lib/config/countries";
 import { formatGbp } from "@/lib/calc/uk/taxCalculator";
 import { Info } from "lucide-react";
+import { useMemo } from "react";
+import { ChipSelect, getDisabledOptions } from "./ChipSelect";
 
 interface Props {
   bands: SalaryBand[];
@@ -28,14 +30,33 @@ export function SalarySelector({
 }: Props) {
   const careerStages = [...new Set(bands.map((b) => b.careerStage))];
 
+  const disabledSectors = useMemo(
+    () => getDisabledOptions(bands, "careerStage", selectedBand.careerStage, config.sectors),
+    [bands, selectedBand.careerStage, config.sectors],
+  );
+  const disabledCareerStages = useMemo(
+    () => getDisabledOptions(bands, "sector", selectedBand.sector, careerStages),
+    [bands, selectedBand.sector, careerStages],
+  );
+
   const handleCareerChange = (stage: string) => {
     const band = bands.find((b) => b.careerStage === stage && b.sector === selectedBand.sector);
-    if (band) onBandChange(band);
+    if (band) {
+      onBandChange(band);
+    } else {
+      const fallback = bands.find((b) => b.careerStage === stage);
+      if (fallback) onBandChange(fallback);
+    }
   };
 
   const handleSectorChange = (sector: string) => {
     const band = bands.find((b) => b.careerStage === selectedBand.careerStage && b.sector === sector);
-    if (band) onBandChange(band);
+    if (band) {
+      onBandChange(band);
+    } else {
+      const fallback = bands.find((b) => b.sector === sector);
+      if (fallback) onBandChange(fallback);
+    }
   };
 
   const grossSalary =
@@ -50,46 +71,32 @@ export function SalarySelector({
 
   return (
     <div
-      className="rounded-2xl p-6 bg-white"
+      className="rounded-2xl p-8 bg-white"
       style={{ border: "1px solid var(--neutral-200)" }}
     >
-      <h2 className="text-lg font-bold mb-5" style={{ color: "var(--primary-900)" }}>
+      <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
         1. Your Salary
       </h2>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+      <div className="space-y-4 mb-4">
         {/* Career Stage */}
-        <div>
-          <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--neutral-700)" }}>
-            Career Stage
-          </label>
-          <select
-            value={selectedBand.careerStage}
-            onChange={(e) => handleCareerChange(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-            style={{ border: "1.5px solid var(--neutral-200)", background: "var(--neutral-50)", color: "var(--neutral-900)" }}
-          >
-            {careerStages.map((stage) => (
-              <option key={stage} value={stage}>{stage}</option>
-            ))}
-          </select>
-        </div>
+        <ChipSelect
+          label="Career Stage"
+          options={careerStages.map((stage) => ({ value: stage, label: stage }))}
+          selected={selectedBand.careerStage}
+          onChange={handleCareerChange}
+          disabledValues={disabledCareerStages}
+        />
 
         {/* Sector */}
         <div>
-          <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--neutral-700)" }}>
-            Sector
-          </label>
-          <select
-            value={selectedBand.sector}
-            onChange={(e) => handleSectorChange(e.target.value)}
-            className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-            style={{ border: "1.5px solid var(--neutral-200)", background: "var(--neutral-50)", color: "var(--neutral-900)" }}
-          >
-            {config.sectors.map((sector) => (
-              <option key={sector} value={sector}>{sector}</option>
-            ))}
-          </select>
+          <ChipSelect
+            label="Sector"
+            options={config.sectors.map((sector) => ({ value: sector, label: sector }))}
+            selected={selectedBand.sector}
+            onChange={handleSectorChange}
+            disabledValues={disabledSectors}
+          />
           {selectedBand.estimationFlag && (
             <p className="mt-1 text-xs flex items-center gap-1" style={{ color: "var(--warning-600)" }}>
               <Info size={11} />
@@ -117,7 +124,7 @@ export function SalarySelector({
                 <button
                   key={point}
                   onClick={() => onSalaryPointChange(point)}
-                  className="flex-1 py-2 rounded-lg text-sm font-medium transition-all text-center"
+                  className="flex-1 py-2 rounded-lg text-sm font-medium transition-all text-center cursor-pointer"
                   style={{
                     background: salaryPoint === point ? "var(--primary-700)" : "var(--neutral-100)",
                     color: salaryPoint === point ? "white" : "var(--neutral-600)",

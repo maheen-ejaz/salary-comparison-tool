@@ -198,7 +198,7 @@ export function calculateDeSavings(
 }
 
 export function formatEur(amount: number): string {
-  return new Intl.NumberFormat("de-DE", {
+  return new Intl.NumberFormat("en-DE", {
     style: "currency",
     currency: "EUR",
     maximumFractionDigits: 0,

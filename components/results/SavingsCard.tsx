@@ -14,7 +14,7 @@ export function SavingsCard({ savings }: Props) {
 
   return (
     <div
-      className="rounded-2xl p-6"
+      className="rounded-2xl p-8"
       style={{
         background: isNeg ? "var(--error-100)" : "var(--success-100)",
         border: `1px solid ${isNeg ? "var(--error-600)" : "var(--success-600)"}`,

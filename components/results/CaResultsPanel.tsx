@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import type { CountryData, SalaryBand, CostOfLivingRow, LifestyleLevel, RentType } from "@/lib/data/types";
 import type { CountryConfig } from "@/lib/config/countries";
 import {
@@ -15,7 +15,8 @@ import { MigrationTimelineCard } from "./MigrationTimelineCard";
 import { CountryComparisonTable } from "./CountryComparisonTable";
 import { computeComparisonRows } from "@/lib/calc/comparisonCalculator";
 import Link from "next/link";
-import { ArrowLeft, Info, TrendingUp, TrendingDown, AlertTriangle } from "lucide-react";
+import { ArrowLeft, Info, TrendingUp, TrendingDown, AlertTriangle, MapPin, Coins, Wallet, Crown, Users, Home, Building2 } from "lucide-react";
+import { ChipSelect, getDisabledOptions } from "./ChipSelect";
 
 interface Props {
   data: CountryData;
@@ -27,6 +28,19 @@ interface Props {
   allCountryData: Record<string, CountryData>;
   allRates: Record<string, number>;
 }
+
+
+const LIFESTYLE_ICONS: Record<string, React.ReactNode> = {
+  Basic: <Coins size={14} />,
+  Moderate: <Wallet size={14} />,
+  Premium: <Crown size={14} />,
+};
+
+const RENT_ICONS: Record<string, React.ReactNode> = {
+  "Shared Accommodation": <Users size={14} />,
+  "1BHK": <Home size={14} />,
+  "Family (2-3 BHK)": <Building2 size={14} />,
+};
 
 const LIFESTYLE_DESCRIPTIONS: Record<LifestyleLevel, string> = {
   Basic: "Single, max savings — shared room, budget supermarkets",
@@ -47,7 +61,7 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
     (b) => b.careerStage === "Resident (PGY1)" && b.sector === "Public (Provincial Health)"
   )!;
   const defaultCoL = data.costOfLiving.find(
-    (r) => r.city === "Toronto" && r.lifestyleLevel === "Moderate" && r.rentType === "1BHK"
+    (r) => r.city === "Toronto" && r.lifestyleLevel === "Basic" && r.rentType === "Shared Accommodation"
   )!;
 
   const [selectedBand, setSelectedBand] = useState<SalaryBand>(defaultBand);
@@ -99,14 +113,33 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
   // Salary selector helpers
   const careerStages = [...new Set(data.salaryBands.map((b) => b.careerStage))];
 
+  const disabledSectors = useMemo(
+    () => getDisabledOptions(data.salaryBands, "careerStage", selectedBand.careerStage, config.sectors),
+    [data.salaryBands, selectedBand.careerStage, config.sectors],
+  );
+  const disabledCareerStages = useMemo(
+    () => getDisabledOptions(data.salaryBands, "sector", selectedBand.sector, careerStages),
+    [data.salaryBands, selectedBand.sector, careerStages],
+  );
+
   const handleCareerChange = (stage: string) => {
     const band = data.salaryBands.find((b) => b.careerStage === stage && b.sector === selectedBand.sector);
-    if (band) setSelectedBand(band);
+    if (band) {
+      setSelectedBand(band);
+    } else {
+      const fallback = data.salaryBands.find((b) => b.careerStage === stage);
+      if (fallback) setSelectedBand(fallback);
+    }
   };
 
   const handleSectorChange = (sector: string) => {
     const band = data.salaryBands.find((b) => b.careerStage === selectedBand.careerStage && b.sector === sector);
-    if (band) setSelectedBand(band);
+    if (band) {
+      setSelectedBand(band);
+    } else {
+      const fallback = data.salaryBands.find((b) => b.sector === sector);
+      if (fallback) setSelectedBand(fallback);
+    }
   };
 
   const isSinglePoint = selectedBand.grossAnnualMin === selectedBand.grossAnnualMax;
@@ -155,14 +188,14 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
             >
               GC
             </div>
-            <span className="text-white font-semibold text-lg">GCWorld Salary Comparison Tool</span>
+            <span className="text-white font-semibold text-lg">Salary Comparison Tool by GooCampus World</span>
           </div>
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm font-medium text-white bg-white/15 hover:bg-white/25 px-4 py-2 rounded-lg transition-colors"
           >
-            <ArrowLeft size={14} />
-            Change country
+            <ArrowLeft size={18} />
+            Back to Home
           </Link>
         </div>
       </header>
@@ -191,46 +224,32 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
         </div>
 
         {/* ============ 1. SALARY SELECTOR ============ */}
-        <div className="rounded-2xl p-6 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-          <h2 className="text-lg font-bold mb-5" style={{ color: "var(--primary-900)" }}>
+        <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
+          <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
             1. Your Salary
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--neutral-700)" }}>
-                Career Stage
-              </label>
-              <select
-                value={selectedBand.careerStage}
-                onChange={(e) => handleCareerChange(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                style={{ border: "1.5px solid var(--neutral-200)", background: "var(--neutral-50)", color: "var(--neutral-900)" }}
-              >
-                {careerStages.map((stage) => (
-                  <option key={stage} value={stage}>{stage}</option>
-                ))}
-              </select>
-            </div>
+          <div className="space-y-4 mb-4">
+            <ChipSelect
+              label="Career Stage"
+              options={careerStages.map((stage) => ({ value: stage, label: stage }))}
+              selected={selectedBand.careerStage}
+              onChange={handleCareerChange}
+              disabledValues={disabledCareerStages}
+            />
 
             <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--neutral-700)" }}>
-                Sector
-              </label>
-              <select
-                value={selectedBand.sector}
-                onChange={(e) => handleSectorChange(e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                style={{ border: "1.5px solid var(--neutral-200)", background: "var(--neutral-50)", color: "var(--neutral-900)" }}
-              >
-                {config.sectors.map((sector) => (
-                  <option key={sector} value={sector}>{sector}</option>
-                ))}
-              </select>
+              <ChipSelect
+                label="Sector"
+                options={config.sectors.map((sector) => ({ value: sector, label: sector }))}
+                selected={selectedBand.sector}
+                onChange={handleSectorChange}
+                disabledValues={disabledSectors}
+              />
               {selectedBand.estimationFlag && (
                 <p className="mt-1 text-xs flex items-center gap-1" style={{ color: "var(--warning-600)" }}>
                   <Info size={11} />
-                  Fee-for-service figures are gross billings — 25-40% goes to overhead costs
+                  Private sector figures are estimates — actual earnings vary widely by specialty
                 </p>
               )}
             </div>
@@ -253,7 +272,7 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
                     <button
                       key={point}
                       onClick={() => setSalaryPoint(point)}
-                      className="flex-1 py-2 rounded-lg text-sm font-medium transition-all text-center"
+                      className="flex-1 py-2 rounded-lg text-sm font-medium transition-all text-center cursor-pointer"
                       style={{
                         background: salaryPoint === point ? "var(--primary-700)" : "var(--neutral-100)",
                         color: salaryPoint === point ? "white" : "var(--neutral-600)",
@@ -294,11 +313,22 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
           </div>
         </div>
 
+        {/* IMG Earnings Note */}
+        <div
+          className="flex items-start gap-3 px-4 py-3.5 rounded-xl"
+          style={{ background: "var(--primary-100)", border: "1px solid var(--primary-200)" }}
+        >
+          <Info size={18} className="mt-0.5 shrink-0" style={{ color: "var(--primary-600)" }} />
+          <p className="text-sm" style={{ color: "var(--primary-600)" }}>
+            <span className="font-semibold">Note:</span> IMGs have the opportunity to earn more by doing locums, on-calls, night-shifts, and overtime. The figures shown represent base salary only.
+          </p>
+        </div>
+
         {/* ============ 2. TAX BREAKDOWN + 3. TAKE-HOME ============ */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Tax Breakdown */}
-          <div className="rounded-2xl p-6 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-            <h2 className="text-lg font-bold mb-5" style={{ color: "var(--primary-900)" }}>
+          <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
+            <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
               2. Tax Breakdown ({province})
             </h2>
 
@@ -346,7 +376,7 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
 
           {/* Take-Home Card */}
           <div
-            className="rounded-2xl p-6"
+            className="rounded-2xl p-8"
             style={{ background: "var(--primary-900)", border: "1px solid var(--primary-700)" }}
           >
             <h2 className="text-lg font-bold mb-1 text-white">Monthly Take-Home</h2>
@@ -381,56 +411,33 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
         </div>
 
         {/* ============ 3. COST OF LIVING ============ */}
-        <div className="rounded-2xl p-6 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-          <h2 className="text-lg font-bold mb-5" style={{ color: "var(--primary-900)" }}>
+        <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
+          <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
             3. Cost of Living
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--neutral-700)" }}>City</label>
-              <select
-                value={selectedCoL.city}
-                onChange={(e) => handleColChange(e.target.value, selectedCoL.lifestyleLevel, selectedCoL.rentType)}
-                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                style={{ border: "1.5px solid var(--neutral-200)", background: "var(--neutral-50)", color: "var(--neutral-900)" }}
-              >
-                {config.cities.map((city) => (
-                  <option key={city} value={city}>{city}</option>
-                ))}
-              </select>
-            </div>
+          <div className="space-y-4 mb-5">
+            <ChipSelect
+              label="City"
+              options={config.cities.map((city) => ({ value: city, label: city, icon: <MapPin size={14} /> }))}
+              selected={selectedCoL.city}
+              onChange={(city) => handleColChange(city, selectedCoL.lifestyleLevel, selectedCoL.rentType)}
+            />
 
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--neutral-700)" }}>Lifestyle</label>
-              <select
-                value={selectedCoL.lifestyleLevel}
-                onChange={(e) => handleColChange(selectedCoL.city, e.target.value as LifestyleLevel, selectedCoL.rentType)}
-                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                style={{ border: "1.5px solid var(--neutral-200)", background: "var(--neutral-50)", color: "var(--neutral-900)" }}
-              >
-                {config.lifestyleLevels.map((level) => (
-                  <option key={level} value={level}>{level}</option>
-                ))}
-              </select>
-              <p className="mt-1 text-xs" style={{ color: "var(--neutral-400)" }}>
-                {LIFESTYLE_DESCRIPTIONS[selectedCoL.lifestyleLevel]}
-              </p>
-            </div>
+            <ChipSelect
+              label="Lifestyle"
+              options={config.lifestyleLevels.map((level) => ({ value: level, label: level, icon: LIFESTYLE_ICONS[level] }))}
+              selected={selectedCoL.lifestyleLevel}
+              onChange={(level) => handleColChange(selectedCoL.city, level as LifestyleLevel, selectedCoL.rentType)}
+              description={LIFESTYLE_DESCRIPTIONS[selectedCoL.lifestyleLevel]}
+            />
 
-            <div>
-              <label className="block text-sm font-medium mb-1.5" style={{ color: "var(--neutral-700)" }}>Accommodation</label>
-              <select
-                value={selectedCoL.rentType}
-                onChange={(e) => handleColChange(selectedCoL.city, selectedCoL.lifestyleLevel, e.target.value as RentType)}
-                className="w-full px-3 py-2.5 rounded-lg text-sm outline-none"
-                style={{ border: "1.5px solid var(--neutral-200)", background: "var(--neutral-50)", color: "var(--neutral-900)" }}
-              >
-                {config.rentTypes.map((type) => (
-                  <option key={type} value={type}>{type}</option>
-                ))}
-              </select>
-            </div>
+            <ChipSelect
+              label="Accommodation"
+              options={config.rentTypes.map((type) => ({ value: type, label: type, icon: RENT_ICONS[type] }))}
+              selected={selectedCoL.rentType}
+              onChange={(rent) => handleColChange(selectedCoL.city, selectedCoL.lifestyleLevel, rent as RentType)}
+            />
           </div>
 
           {/* Quebec French warning */}
@@ -480,67 +487,65 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
         </div>
 
         {/* ============ 4. SAVINGS + MIGRATION ============ */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Savings Card */}
-          <div
-            className="rounded-2xl p-6"
-            style={{
-              background: isNeg ? "var(--error-100)" : "var(--success-100)",
-              border: `1px solid ${isNeg ? "var(--error-600)" : "var(--success-600)"}`,
-            }}
-          >
-            <div className="flex items-start justify-between mb-2">
-              <h2 className="text-lg font-bold" style={{ color: isNeg ? "var(--error-600)" : "var(--success-600)" }}>
-                Monthly Savings
-              </h2>
-              {isNeg ? (
-                <TrendingDown size={20} style={{ color: "var(--error-600)" }} />
-              ) : (
-                <TrendingUp size={20} style={{ color: "var(--success-600)" }} />
-              )}
-            </div>
-            <p className="text-sm mb-5" style={{ color: isNeg ? "var(--error-600)" : "var(--success-600)", opacity: 0.8 }}>
-              Take-home minus estimated living costs
-            </p>
-
+        {/* Savings Card */}
+        <div
+          className="rounded-2xl p-8"
+          style={{
+            background: isNeg ? "var(--error-100)" : "var(--success-100)",
+            border: `1px solid ${isNeg ? "var(--error-600)" : "var(--success-600)"}`,
+          }}
+        >
+          <div className="flex items-start justify-between mb-2">
+            <h2 className="text-lg font-bold" style={{ color: isNeg ? "var(--error-600)" : "var(--success-600)" }}>
+              Monthly Savings
+            </h2>
             {isNeg ? (
-              <div>
-                <p className="text-3xl font-bold tabular-nums" style={{ color: "var(--error-600)" }}>
-                  {formatCad(savings.monthlySavingsCad)}
-                </p>
-                <p className="text-sm mt-3 font-medium" style={{ color: "var(--error-600)" }}>
-                  At this lifestyle + city combination, expenses exceed take-home pay. Consider a different city or accommodation type.
-                </p>
-              </div>
+              <TrendingDown size={20} style={{ color: "var(--error-600)" }} />
             ) : (
-              <div className="space-y-1">
-                <p className="text-4xl font-bold tabular-nums" style={{ color: "var(--success-600)" }}>
-                  {formatCad(savings.monthlySavingsCad)}
-                </p>
-                <p className="text-xl font-semibold tabular-nums" style={{ color: "var(--neutral-700)" }}>
-                  {formatInrLakh(savings.monthlySavingsInr)}
-                </p>
-                <p className="text-sm tabular-nums" style={{ color: "var(--neutral-500)" }}>
-                  ({formatInr(savings.monthlySavingsInr)})
-                </p>
-              </div>
-            )}
-
-            {!isNeg && (
-              <div className="mt-5 pt-4" style={{ borderTop: `1px solid rgba(26,122,74,0.15)` }}>
-                <div className="flex justify-between text-sm">
-                  <span style={{ color: "var(--neutral-600)" }}>Annual savings</span>
-                  <span className="tabular-nums font-semibold" style={{ color: "var(--success-600)" }}>
-                    {formatInrLakh(savings.monthlySavingsInr * 12)}/year
-                  </span>
-                </div>
-              </div>
+              <TrendingUp size={20} style={{ color: "var(--success-600)" }} />
             )}
           </div>
+          <p className="text-sm mb-5" style={{ color: isNeg ? "var(--error-600)" : "var(--success-600)", opacity: 0.8 }}>
+            Take-home minus estimated living costs
+          </p>
 
-          {/* Migration Timeline */}
-          <MigrationTimelineCard savings={savings} migrationCosts={data.migrationCosts} />
+          {isNeg ? (
+            <div>
+              <p className="text-3xl font-bold tabular-nums" style={{ color: "var(--error-600)" }}>
+                {formatCad(savings.monthlySavingsCad)}
+              </p>
+              <p className="text-sm mt-3 font-medium" style={{ color: "var(--error-600)" }}>
+                At this lifestyle + city combination, expenses exceed take-home pay. Consider a different city or accommodation type.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-1">
+              <p className="text-4xl font-bold tabular-nums" style={{ color: "var(--success-600)" }}>
+                {formatCad(savings.monthlySavingsCad)}
+              </p>
+              <p className="text-xl font-semibold tabular-nums" style={{ color: "var(--neutral-700)" }}>
+                {formatInrLakh(savings.monthlySavingsInr)}
+              </p>
+              <p className="text-sm tabular-nums" style={{ color: "var(--neutral-500)" }}>
+                ({formatInr(savings.monthlySavingsInr)})
+              </p>
+            </div>
+          )}
+
+          {!isNeg && (
+            <div className="mt-5 pt-4" style={{ borderTop: `1px solid rgba(26,122,74,0.15)` }}>
+              <div className="flex justify-between text-sm">
+                <span style={{ color: "var(--neutral-600)" }}>Annual savings</span>
+                <span className="tabular-nums font-semibold" style={{ color: "var(--success-600)" }}>
+                  {formatInrLakh(savings.monthlySavingsInr * 12)}/year
+                </span>
+              </div>
+            </div>
+          )}
         </div>
+
+        {/* Migration Timeline */}
+        <MigrationTimelineCard savings={savings} migrationCosts={data.migrationCosts} />
 
         {/* Country Comparison */}
         <CountryComparisonTable

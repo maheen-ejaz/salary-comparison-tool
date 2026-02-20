@@ -46,7 +46,7 @@ const AU_MIGRATION_LINE_ITEM_MAP: LineItemMapping[] = [
   { csvColumn: "AHPRA_Annual_Renewal_INR",       key: "ahpraRenewal",       label: "AHPRA Annual Renewal (Year 1)",          category: "Exams & Registration" },
   { csvColumn: "Skills_Assessment_Fee_INR",      key: "skillsAssessment",   label: "Skills Assessment (AMC)",                category: "Exams & Registration" },
   { csvColumn: "Visa_482_Fee_INR",               key: "visa482",            label: "Subclass 482 TSS Visa",                  category: "Visa & Immigration" },
-  { csvColumn: "Visa_189_190_PR_Fee_INR",        key: "visa189190",         label: "Subclass 189/190 PR Visa (optional)",     category: "Visa & Immigration" },
+  { csvColumn: "Visa_189_190_PR_Fee_INR",        key: "visa189190",         label: "Subclass 189/190 PR Visa (optional — only if pursuing permanent residency)", category: "Visa & Immigration" },
   { csvColumn: "Health_Insurance_Year1_INR",     key: "healthInsurance",    label: "Health Insurance / OSHC (1st year)",      category: "Visa & Immigration" },
   { csvColumn: "Coaching_Fees_INR",              key: "coachingFees",       label: "AMC Exam Coaching",                      category: "Preparation & Coaching" },
   { csvColumn: "Travel_Costs_INR",               key: "travelCosts",        label: "Travel to Australia (flights)",           category: "Travel & Logistics" },
@@ -59,7 +59,7 @@ const AU_MIGRATION_LINE_ITEM_MAP: LineItemMapping[] = [
 const CA_MIGRATION_LINE_ITEM_MAP: LineItemMapping[] = [
   { csvColumn: "MCCQE1_Fee_INR",               key: "mccqe1",              label: "MCCQE Part 1 Exam Fee",                 category: "Exams & Registration" },
   { csvColumn: "NAC_OSCE_Fee_INR",              key: "nacOsce",             label: "NAC OSCE Exam Fee",                     category: "Exams & Registration" },
-  { csvColumn: "MCCQE2_Fee_INR",               key: "mccqe2",              label: "MCCQE Part 2 Exam Fee",                 category: "Exams & Registration" },
+
   { csvColumn: "OET_IELTS_Fee_INR",             key: "oetIeltsFee",         label: "OET / IELTS Exam Fee",                  category: "Exams & Registration" },
   { csvColumn: "Provincial_License_Fee_INR",    key: "provincialLicense",   label: "Provincial Medical License",            category: "Exams & Registration" },
   { csvColumn: "CaRMS_Fee_INR",                key: "carmsFee",            label: "CaRMS Application Fee",                 category: "Exams & Registration" },
@@ -74,7 +74,7 @@ const CA_MIGRATION_LINE_ITEM_MAP: LineItemMapping[] = [
 ];
 
 const DE_MIGRATION_LINE_ITEM_MAP: LineItemMapping[] = [
-  { csvColumn: "German_B2_Course_INR",         key: "germanB2Course",       label: "German B2 Language Course",              category: "Preparation & Coaching" },
+  { csvColumn: "German_B2_Course_INR",         key: "germanCourse",         label: "German Language Course (A1–B2)",         category: "Preparation & Coaching" },
   { csvColumn: "Fachsprachpruefung_Fee_INR",   key: "fachsprachpruefung",   label: "Fachsprachprüfung (Medical German C1)",  category: "Exams & Registration" },
   { csvColumn: "Kenntnisspruefung_Fee_INR",    key: "kenntnisspruefung",    label: "Kenntnisprüfung (Knowledge Exam)",       category: "Exams & Registration" },
   { csvColumn: "Approbation_Application_INR",  key: "approbationApp",       label: "Approbation Application Fee",            category: "Exams & Registration" },

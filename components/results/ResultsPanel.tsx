@@ -14,7 +14,7 @@ import { MigrationTimelineCard } from "./MigrationTimelineCard";
 import { CountryComparisonTable } from "./CountryComparisonTable";
 import { DisclaimerBanner } from "./DisclaimerBanner";
 import Link from "next/link";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Info } from "lucide-react";
 
 interface Props {
   data: CountryData;
@@ -36,7 +36,7 @@ export function ResultsPanel({ data, config, leadName, liveRate, rateIsLive, rat
   const [includeNhsPension, setIncludeNhsPension] = useState(true);
   const [selectedCoL, setSelectedCoL] = useState<CostOfLivingRow>(
     data.costOfLiving.find(
-      (r) => r.city === "London" && r.lifestyleLevel === "Moderate" && r.rentType === "1BHK"
+      (r) => r.city === "London" && r.lifestyleLevel === "Basic" && r.rentType === "Shared Accommodation"
     )!
   );
 
@@ -92,14 +92,14 @@ export function ResultsPanel({ data, config, leadName, liveRate, rateIsLive, rat
             >
               GC
             </div>
-            <span className="text-white font-semibold text-lg">GCWorld Salary Comparison Tool</span>
+            <span className="text-white font-semibold text-lg">Salary Comparison Tool by GooCampus World</span>
           </div>
           <Link
             href="/"
-            className="flex items-center gap-1.5 text-sm text-white/70 hover:text-white transition-colors"
+            className="flex items-center gap-2 text-sm font-medium text-white bg-white/15 hover:bg-white/25 px-4 py-2 rounded-lg transition-colors"
           >
-            <ArrowLeft size={14} />
-            Change country
+            <ArrowLeft size={18} />
+            Back to Home
           </Link>
         </div>
       </header>
@@ -139,6 +139,17 @@ export function ResultsPanel({ data, config, leadName, liveRate, rateIsLive, rat
           onPensionToggle={setIncludeNhsPension}
         />
 
+        {/* IMG Earnings Note */}
+        <div
+          className="flex items-start gap-3 px-4 py-3.5 rounded-xl"
+          style={{ background: "var(--primary-100)", border: "1px solid var(--primary-200)" }}
+        >
+          <Info size={18} className="mt-0.5 shrink-0" style={{ color: "var(--primary-600)" }} />
+          <p className="text-sm" style={{ color: "var(--primary-600)" }}>
+            <span className="font-semibold">Note:</span> IMGs have the opportunity to earn more by doing locums, on-calls, night-shifts, and overtime. The figures shown represent base salary only.
+          </p>
+        </div>
+
         {/* Tax + Take-Home row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TaxBreakdownCard
@@ -159,11 +170,9 @@ export function ResultsPanel({ data, config, leadName, liveRate, rateIsLive, rat
           onChange={setSelectedCoL}
         />
 
-        {/* Savings + Timeline row */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <SavingsCard savings={savings} liveRate={liveRate} />
-          <MigrationTimelineCard savings={savings} migrationCosts={data.migrationCosts} />
-        </div>
+        {/* Savings + Timeline */}
+        <SavingsCard savings={savings} liveRate={liveRate} />
+        <MigrationTimelineCard savings={savings} migrationCosts={data.migrationCosts} />
 
         {/* Country Comparison */}
         <CountryComparisonTable

@@ -71,27 +71,39 @@ export function CountryComparisonTable({ rows, currentCountryCode }: Props) {
                       </div>
                     </div>
                   </td>
-                  <td className="px-4 py-4 text-right tabular-nums">
-                    <div className="font-semibold" style={{ color: "var(--neutral-900)" }}>
-                      {formatLocalCurrency(row.currencySymbol, row.monthlyTakeHomeLocal)}
-                    </div>
-                    <div className="text-xs" style={{ color: "var(--neutral-500)" }}>
-                      {formatInrLakh(row.monthlyTakeHomeInr)}/mo
-                    </div>
-                  </td>
-                  <td className="px-4 py-4 text-right tabular-nums">
-                    <div
-                      className="font-semibold"
-                      style={{ color: row.isNegativeSavings ? "var(--error-600)" : "var(--success-600)" }}
-                    >
-                      {row.isNegativeSavings ? "−" : ""}{formatInrLakh(Math.abs(row.monthlySavingsInr))}/mo
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 text-right tabular-nums">
-                    <div className="font-semibold" style={{ color: "var(--primary-700)" }}>
-                      {row.isNegativeSavings ? "N/A" : formatMonths(row.recoveryMonthsTypical)}
-                    </div>
-                  </td>
+                  {row.dataUnavailable ? (
+                    <>
+                      <td className="px-4 py-4 text-right" style={{ color: "var(--neutral-400)" }}>
+                        <div className="text-xs">Data unavailable</div>
+                      </td>
+                      <td className="px-4 py-4 text-right" style={{ color: "var(--neutral-400)" }}>—</td>
+                      <td className="px-6 py-4 text-right" style={{ color: "var(--neutral-400)" }}>—</td>
+                    </>
+                  ) : (
+                    <>
+                      <td className="px-4 py-4 text-right tabular-nums">
+                        <div className="font-semibold" style={{ color: "var(--neutral-900)" }}>
+                          {formatLocalCurrency(row.currencySymbol, row.monthlyTakeHomeLocal)}
+                        </div>
+                        <div className="text-xs" style={{ color: "var(--neutral-500)" }}>
+                          {formatInrLakh(row.monthlyTakeHomeInr)}/mo
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 text-right tabular-nums">
+                        <div
+                          className="font-semibold"
+                          style={{ color: row.isNegativeSavings ? "var(--error-600)" : "var(--success-600)" }}
+                        >
+                          {row.isNegativeSavings ? "−" : ""}{formatInrLakh(Math.abs(row.monthlySavingsInr))}/mo
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right tabular-nums">
+                        <div className="font-semibold" style={{ color: "var(--primary-700)" }}>
+                          {row.isNegativeSavings ? "N/A" : formatMonths(row.recoveryMonthsTypical)}
+                        </div>
+                      </td>
+                    </>
+                  )}
                 </tr>
               ))}
 

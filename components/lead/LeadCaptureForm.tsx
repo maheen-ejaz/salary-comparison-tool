@@ -10,7 +10,8 @@ export interface LeadData {
   phone: string;
   educationStatus: string;
 }
-import { ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const schema = z.object({
   name: z.string().min(2, "Please enter your name"),
@@ -56,14 +57,23 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
     <main className="min-h-screen" style={{ background: "var(--neutral-50)" }}>
       {/* Header */}
       <header className="px-6 py-4" style={{ background: "var(--primary-900)" }}>
-        <div className="max-w-5xl mx-auto flex items-center gap-3">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
-            style={{ background: "var(--accent-400)", color: "var(--primary-900)" }}
-          >
-            GC
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div
+              className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
+              style={{ background: "var(--accent-400)", color: "var(--primary-900)" }}
+            >
+              GC
+            </div>
+            <span className="text-white font-semibold text-lg">Salary Comparison Tool by GooCampus World</span>
           </div>
-          <span className="text-white font-semibold text-lg">GCWorld Salary Comparison Tool</span>
+          <Link
+            href="/"
+            className="flex items-center gap-2 text-sm font-medium text-white bg-white/15 hover:bg-white/25 px-4 py-2 rounded-lg transition-colors"
+          >
+            <ArrowLeft size={18} />
+            Back to Home
+          </Link>
         </div>
       </header>
 

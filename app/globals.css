@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
 :root {
-  /* Primary — Deep Teal */
-  --primary-900: #0D3B4A;
-  --primary-700: #1A5C74;
-  --primary-500: #2A8FAB;
-  --primary-200: #90CDE0;
-  --primary-100: #E0F4FA;
-  --primary-50: #F0FAFE;
+  /* Primary — Warm Midnight Navy */
+  --primary-900: #1B2444;
+  --primary-700: #2E4072;
+  --primary-500: #4663A8;
+  --primary-200: #A4B8DB;
+  --primary-100: #E3EAF5;
+  --primary-50: #F2F5FA;
 
   /* Accent — Warm Gold */
   --accent-600: #C4860A;
