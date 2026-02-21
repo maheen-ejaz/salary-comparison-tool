@@ -25,7 +25,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={dmSans.variable}>
+    <html lang="en" className={`${dmSans.variable} scroll-smooth`}>
       <body className="font-[var(--font-dm-sans)] antialiased bg-[var(--background)] text-[var(--foreground)]">
         {children}
       </body>

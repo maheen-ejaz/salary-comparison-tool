@@ -167,7 +167,7 @@ export function formatGbp(amount: number): string {
   return new Intl.NumberFormat("en-GB", {
     style: "currency",
     currency: "GBP",
-
+    currencyDisplay: "code",
     maximumFractionDigits: 0,
   }).format(amount);
 }
@@ -176,13 +176,14 @@ export function formatInr(amount: number): string {
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
+    currencyDisplay: "code",
     maximumFractionDigits: 0,
   }).format(amount);
 }
 
 export function formatInrLakh(amount: number): string {
   const lakh = amount / 100000;
-  return `₹${lakh.toFixed(2)}L`;
+  return `INR ${lakh.toFixed(2)}L`;
 }
 
 export function formatMonths(months: number): string {

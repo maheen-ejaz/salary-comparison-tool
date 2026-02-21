@@ -242,6 +242,7 @@ export function formatCad(amount: number): string {
   return new Intl.NumberFormat("en-CA", {
     style: "currency",
     currency: "CAD",
+    currencyDisplay: "code",
     maximumFractionDigits: 0,
   }).format(amount);
 }

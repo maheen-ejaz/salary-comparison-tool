@@ -1,8 +1,8 @@
 "use client";
 
+import React from "react";
 import type { SalaryBand } from "@/lib/data/types";
 import type { CountryConfig } from "@/lib/config/countries";
-import { formatGbp } from "@/lib/calc/uk/taxCalculator";
 import { Info } from "lucide-react";
 import { useMemo } from "react";
 import { ChipSelect, getDisabledOptions } from "./ChipSelect";
@@ -12,10 +12,11 @@ interface Props {
   config: CountryConfig;
   selectedBand: SalaryBand;
   salaryPoint: "min" | "typical" | "max";
-  includeNhsPension: boolean;
   onBandChange: (band: SalaryBand) => void;
   onSalaryPointChange: (point: "min" | "typical" | "max") => void;
-  onPensionToggle: (include: boolean) => void;
+  formatCurrency: (amount: number) => string;
+  /** Extra content rendered below the gross salary display (e.g. pension toggle, super info) */
+  grossDisplayExtra?: React.ReactNode;
 }
 
 export function SalarySelector({
@@ -23,10 +24,10 @@ export function SalarySelector({
   config,
   selectedBand,
   salaryPoint,
-  includeNhsPension,
   onBandChange,
   onSalaryPointChange,
-  onPensionToggle,
+  formatCurrency,
+  grossDisplayExtra,
 }: Props) {
   const careerStages = [...new Set(bands.map((b) => b.careerStage))];
 
@@ -120,19 +121,26 @@ export function SalarySelector({
                 typical: selectedBand.grossAnnualTypical,
                 max: selectedBand.grossAnnualMax,
               };
+              const isActive = salaryPoint === point;
+              const unselectedStyles: Record<string, { bg: string; color: string; border: string }> = {
+                min: { bg: "var(--primary-100)", color: "var(--primary-700)", border: "var(--primary-200)" },
+                typical: { bg: "var(--neutral-100)", color: "var(--neutral-600)", border: "var(--neutral-200)" },
+                max: { bg: "var(--success-100)", color: "var(--success-600)", border: "var(--success-200)" },
+              };
+              const inactive = unselectedStyles[point];
               return (
                 <button
                   key={point}
                   onClick={() => onSalaryPointChange(point)}
                   className="flex-1 py-2 rounded-lg text-sm font-medium transition-all text-center cursor-pointer"
                   style={{
-                    background: salaryPoint === point ? "var(--primary-700)" : "var(--neutral-100)",
-                    color: salaryPoint === point ? "white" : "var(--neutral-600)",
-                    border: salaryPoint === point ? "1.5px solid var(--primary-700)" : "1.5px solid var(--neutral-200)",
+                    background: isActive ? "var(--primary-700)" : inactive.bg,
+                    color: isActive ? "white" : inactive.color,
+                    border: isActive ? "1.5px solid var(--primary-700)" : `1.5px solid ${inactive.border}`,
                   }}
                 >
                   <div>{labels[point]}</div>
-                  <div className="text-xs tabular-nums font-normal opacity-80">{formatGbp(values[point])}</div>
+                  <div className="text-xs tabular-nums font-normal opacity-80">{formatCurrency(values[point])}</div>
                 </button>
               );
             })}
@@ -140,35 +148,23 @@ export function SalarySelector({
         </div>
       )}
 
-      {/* Gross display + pension toggle */}
+      {/* Gross display */}
       <div
-        className="flex items-center justify-between rounded-xl px-4 py-3"
+        className="rounded-xl px-4 py-3"
         style={{ background: "var(--primary-50)", border: "1px solid var(--primary-100)" }}
       >
-        <div>
-          <p className="text-xs" style={{ color: "var(--neutral-600)" }}>Gross Annual Salary</p>
-          <p className="text-2xl font-bold tabular-nums" style={{ color: "var(--primary-900)" }}>
-            {formatGbp(grossSalary)}
-          </p>
-        </div>
-        <label className="flex items-center gap-2 cursor-pointer text-sm" style={{ color: "var(--neutral-700)" }}>
-          <span>Include NHS Pension</span>
-          <div
-            onClick={() => onPensionToggle(!includeNhsPension)}
-            className="relative w-10 h-5.5 rounded-full cursor-pointer transition-colors"
-            style={{ background: includeNhsPension ? "var(--primary-700)" : "var(--neutral-300)", width: 40, height: 22 }}
-          >
-            <div
-              className="absolute top-0.5 rounded-full bg-white transition-transform shadow"
-              style={{
-                width: 18,
-                height: 18,
-                left: includeNhsPension ? 20 : 2,
-                transition: "left 0.15s ease",
-              }}
-            />
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-xs" style={{ color: "var(--neutral-600)" }}>Gross Annual Salary</p>
+            <p className="text-2xl font-bold tabular-nums" style={{ color: "var(--primary-900)" }}>
+              {formatCurrency(grossSalary)}
+            </p>
           </div>
-        </label>
+        </div>
+        {grossDisplayExtra}
+        <p className="text-[10px] mt-2" style={{ color: "var(--neutral-400)" }}>
+          Salary figures are estimates. Actual earnings vary by specialty and employer.
+        </p>
       </div>
     </div>
   );

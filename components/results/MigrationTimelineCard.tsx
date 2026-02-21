@@ -5,8 +5,10 @@ import type { MigrationCosts, MigrationCostCategory } from "@/lib/data/types";
 import { formatInr, formatInrLakh, formatMonths } from "@/lib/calc/uk/taxCalculator";
 import { Clock, ChevronDown, ChevronUp } from "lucide-react";
 
+
 interface RecoveryData {
   isNegativeSavings: boolean;
+  monthlySavingsInr: number;
   recoveryMonthsMin: number;
   recoveryMonthsTypical: number;
   recoveryMonthsMax: number;
@@ -261,7 +263,7 @@ export function MigrationTimelineCard({ savings, migrationCosts }: Props) {
 
             {/* Fade gradient + "Show all" button */}
             {remainingCount > 0 && (
-              <div style={{ position: "relative" }}>
+              <div style={{ position: "relative", paddingBottom: "12px" }}>
                 {/* Gradient overlay fading into the button area */}
                 <div
                   style={{

@@ -130,6 +130,7 @@ export function formatNzd(amount: number): string {
   return new Intl.NumberFormat("en-NZ", {
     style: "currency",
     currency: "NZD",
+    currencyDisplay: "code",
     maximumFractionDigits: 0,
   }).format(amount);
 }

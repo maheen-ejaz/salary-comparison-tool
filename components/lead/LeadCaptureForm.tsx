@@ -58,14 +58,9 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
       {/* Header */}
       <header className="px-6 py-4" style={{ background: "var(--primary-900)" }}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
-              style={{ background: "var(--accent-400)", color: "var(--primary-900)" }}
-            >
-              GC
-            </div>
-            <span className="text-white font-semibold text-lg">Salary Comparison Tool by GooCampus World</span>
+          <div className="flex items-center gap-2">
+            <span className="text-white font-semibold text-sm">Salary Comparison Tool by</span>
+            <img src="/goocampus-logo-white.png" alt="GooCampus World" className="h-6" />
           </div>
           <Link
             href="/"

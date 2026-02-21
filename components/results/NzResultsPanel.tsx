@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import type { CountryData, SalaryBand, CostOfLivingRow, LifestyleLevel, RentType } from "@/lib/data/types";
+import type { CountryData, SalaryBand, CostOfLivingRow } from "@/lib/data/types";
 import type { CountryConfig } from "@/lib/config/countries";
 import {
   calculateNzTakeHome,
@@ -9,12 +9,24 @@ import {
   formatNzd,
   formatInr,
 } from "@/lib/calc/nz/taxCalculator";
+import { computeComparisonRows } from "@/lib/calc/comparisonCalculator";
+import { SalarySelector } from "./SalarySelector";
+import { TaxBreakdownCard } from "./TaxBreakdownCard";
+import type { TaxRow } from "./TaxBreakdownCard";
+import { TakeHomeCard } from "./TakeHomeCard";
+import { CostOfLivingSelector } from "./CostOfLivingSelector";
+import type { CostBreakdownItem } from "./CostOfLivingSelector";
+import { SavingsCard } from "./SavingsCard";
 import { MigrationTimelineCard } from "./MigrationTimelineCard";
 import { CountryComparisonTable } from "./CountryComparisonTable";
-import { computeComparisonRows } from "@/lib/calc/comparisonCalculator";
+import { CurrencyToggle } from "./CurrencyToggle";
+import { DisclaimerBanner } from "./DisclaimerBanner";
+import { SectionNav } from "./SectionNav";
+import type { NavSection } from "./SectionNav";
 import Link from "next/link";
-import { ArrowLeft, Info, TrendingUp, TrendingDown, MapPin, Coins, Wallet, Crown, Users, Home, Building2 } from "lucide-react";
-import { ChipSelect, getDisabledOptions } from "./ChipSelect";
+import { ArrowLeft, Info } from "lucide-react";
+import type { DonutSlice } from "@/components/charts/types";
+import type { LifestyleLevel } from "@/lib/data/types";
 
 interface Props {
   data: CountryData;
@@ -33,17 +45,15 @@ const LIFESTYLE_DESCRIPTIONS: Record<LifestyleLevel, string> = {
   Premium: "Family, high quality — 2-3 bed, premium amenities",
 };
 
-const LIFESTYLE_ICONS: Record<string, React.ReactNode> = {
-  Basic: <Coins size={14} />,
-  Moderate: <Wallet size={14} />,
-  Premium: <Crown size={14} />,
-};
-
-const RENT_ICONS: Record<string, React.ReactNode> = {
-  "Shared Accommodation": <Users size={14} />,
-  "1BHK": <Home size={14} />,
-  "Family (2-3 BHK)": <Building2 size={14} />,
-};
+const SECTIONS: NavSection[] = [
+  { id: "section-salary", label: "1. Salary", shortLabel: "Salary" },
+  { id: "section-tax", label: "2. Tax", shortLabel: "Tax" },
+  { id: "section-takehome", label: "3. Take-Home", shortLabel: "Pay" },
+  { id: "section-col", label: "4. Living Costs", shortLabel: "CoL" },
+  { id: "section-savings", label: "5. Savings", shortLabel: "Savings" },
+  { id: "section-migration", label: "6. Migration", shortLabel: "Migration" },
+  { id: "section-comparison", label: "7. Comparison", shortLabel: "Compare" },
+];
 
 export function NzResultsPanel({ data, config, leadName, liveRate, rateIsLive, rateDate, allCountryData, allRates }: Props) {
   const defaultBand = data.salaryBands.find(
@@ -56,6 +66,7 @@ export function NzResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
   const [selectedBand, setSelectedBand] = useState<SalaryBand>(defaultBand);
   const [salaryPoint, setSalaryPoint] = useState<"min" | "typical" | "max">("typical");
   const [selectedCoL, setSelectedCoL] = useState<CostOfLivingRow>(defaultCoL);
+  const [displayCurrency, setDisplayCurrency] = useState<"local" | "inr">("local");
 
   const grossAnnual =
     salaryPoint === "min"
@@ -97,49 +108,29 @@ export function NzResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
     [selectedBand.careerStage, salaryPoint, taxBreakdown.netMonthly, selectedCoL.totalMonthlyCost, selectedCoL.city, selectedCoL.lifestyleLevel, selectedCoL.rentType, allCountryData, allRates]
   );
 
-  // Salary selector helpers
-  const careerStages = [...new Set(data.salaryBands.map((b) => b.careerStage))];
+  const displayFormat = displayCurrency === "inr"
+    ? (amount: number) => formatInr(Math.round(amount * liveRate))
+    : formatNzd;
 
-  const disabledSectors = useMemo(
-    () => getDisabledOptions(data.salaryBands, "careerStage", selectedBand.careerStage, config.sectors),
-    [data.salaryBands, selectedBand.careerStage, config.sectors],
-  );
-  const disabledCareerStages = useMemo(
-    () => getDisabledOptions(data.salaryBands, "sector", selectedBand.sector, careerStages),
-    [data.salaryBands, selectedBand.sector, careerStages],
-  );
+  const monthlyInr = Math.round(taxBreakdown.netMonthly * liveRate);
 
-  const handleCareerChange = (stage: string) => {
-    const band = data.salaryBands.find((b) => b.careerStage === stage && b.sector === selectedBand.sector);
-    if (band) {
-      setSelectedBand(band);
-    } else {
-      const fallback = data.salaryBands.find((b) => b.careerStage === stage);
-      if (fallback) setSelectedBand(fallback);
-    }
-  };
+  // Build tax rows
+  const taxRows: TaxRow[] = [
+    { label: "Gross Annual Salary", value: taxBreakdown.grossAnnual, isGross: true },
+    { label: "Income Tax (PAYE)", value: -taxBreakdown.incomeTax, isDeduction: true },
+    { label: "ACC Earners' Levy", value: -taxBreakdown.accLevy, isDeduction: true },
+    { label: "KiwiSaver (3% employee)", value: -taxBreakdown.kiwisaver, isDeduction: true },
+  ];
 
-  const handleSectorChange = (sector: string) => {
-    const band = data.salaryBands.find((b) => b.careerStage === selectedBand.careerStage && b.sector === sector);
-    if (band) {
-      setSelectedBand(band);
-    } else {
-      const fallback = data.salaryBands.find((b) => b.sector === sector);
-      if (fallback) setSelectedBand(fallback);
-    }
-  };
+  const donutSlices: DonutSlice[] = [
+    { label: "Income Tax", value: taxBreakdown.incomeTax, color: "var(--error-600)" },
+    ...(taxBreakdown.accLevy > 0 ? [{ label: "ACC Levy", value: taxBreakdown.accLevy, color: "var(--warning-600)" }] : []),
+    ...(taxBreakdown.kiwisaver > 0 ? [{ label: "KiwiSaver", value: taxBreakdown.kiwisaver, color: "var(--accent-600)" }] : []),
+    { label: "Take-Home", value: taxBreakdown.netAnnual, color: "var(--success-600)" },
+  ];
 
-  const isSinglePoint = selectedBand.grossAnnualMin === selectedBand.grossAnnualMax;
-
-  // CoL helpers
-  const handleColChange = (city: string, lifestyle: LifestyleLevel, rent: RentType) => {
-    const row = data.costOfLiving.find(
-      (r) => r.city === city && r.lifestyleLevel === lifestyle && r.rentType === rent
-    );
-    if (row) setSelectedCoL(row);
-  };
-
-  const colBreakdown = [
+  // Build CoL breakdown items
+  const colBreakdown: CostBreakdownItem[] = [
     { label: "Rent", value: selectedCoL.monthlyRent },
     { label: "Utilities & Internet", value: selectedCoL.monthlyUtilities },
     { label: "Transport", value: selectedCoL.monthlyTransport },
@@ -150,22 +141,37 @@ export function NzResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
     { label: "Miscellaneous", value: selectedCoL.monthlyMisc },
   ].filter((item) => item.value > 0);
 
-  const isNeg = savings.isNegativeSavings;
-  const monthlyInr = Math.round(taxBreakdown.netMonthly * liveRate);
+  // KiwiSaver info note
+  const taxInfoNotes: React.ReactNode[] = [
+    <div
+      key="kiwisaver"
+      className="mt-3 text-xs p-3 rounded-lg"
+      style={{ background: "var(--neutral-50)", color: "var(--neutral-600)" }}
+    >
+      <p className="font-semibold mb-1">Note on KiwiSaver</p>
+      <p>
+        Employer contributes matching 3% (not deducted from your pay). Many doctors opt into KiwiSaver for
+        retirement savings. You can increase employee contribution to 4%, 6%, 8%, or 10% if desired.
+      </p>
+    </div>,
+  ];
+
+  // Gross display extra: INR per year
+  const grossExtra = (
+    <div className="flex items-center gap-1.5 mt-2 text-xs" style={{ color: "var(--neutral-500)" }}>
+      <Info size={11} />
+      <span>{formatInr(grossAnnual * liveRate)} per year</span>
+    </div>
+  );
 
   return (
     <main className="min-h-screen" style={{ background: "var(--neutral-50)" }}>
       {/* Header */}
       <header className="px-6 py-4 sticky top-0 z-10" style={{ background: "var(--primary-900)" }}>
         <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm"
-              style={{ background: "var(--accent-400)", color: "var(--primary-900)" }}
-            >
-              GC
-            </div>
-            <span className="text-white font-semibold text-lg">Salary Comparison Tool by GooCampus World</span>
+          <div className="flex items-center gap-2">
+            <span className="text-white font-semibold text-sm">Salary Comparison Tool by</span>
+            <img src="/goocampus-logo-white.png" alt="GooCampus World" className="h-6" />
           </div>
           <Link
             href="/"
@@ -205,87 +211,37 @@ export function NzResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
         </div>
 
         {/* Rate info */}
-        <div
-          className="text-xs px-3 py-2 rounded-lg inline-flex items-center gap-2"
-          style={{
-            background: rateIsLive ? "var(--success-100)" : "var(--warning-100)",
-            color: rateIsLive ? "var(--success-600)" : "var(--warning-600)",
-          }}
-        >
-          <span className={`w-1.5 h-1.5 rounded-full ${rateIsLive ? "bg-green-500" : "bg-amber-500"}`} />
-          Exchange rate: NZ$ 1 = &#8377;{liveRate.toFixed(2)} ({rateIsLive ? "live" : `data from ${rateDate}`})
-        </div>
-
-        {/* ============ 1. SALARY SELECTOR ============ */}
-        <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-          <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
-            1. Your Salary
-          </h2>
-
-          <div className="space-y-4 mb-4">
-            <ChipSelect
-              label="Career Stage"
-              options={careerStages.map((stage) => ({ value: stage, label: stage }))}
-              selected={selectedBand.careerStage}
-              onChange={handleCareerChange}
-              disabledValues={disabledCareerStages}
-            />
-
-            <div>
-              <ChipSelect
-                label="Sector"
-                options={config.sectors.map((sector) => ({ value: sector, label: sector }))}
-                selected={selectedBand.sector}
-                onChange={handleSectorChange}
-                disabledValues={disabledSectors}
-              />
-              {selectedBand.estimationFlag && (
-                <p className="mt-1 text-xs flex items-center gap-1" style={{ color: "var(--warning-600)" }}>
-                  <Info size={11} />
-                  Private sector figures are estimates — actual earnings vary widely by specialty
-                </p>
-              )}
-            </div>
+        <div className="flex items-center gap-3 flex-wrap">
+          <div
+            className="text-xs px-3 py-2 rounded-lg inline-flex items-center gap-2"
+            style={{
+              background: rateIsLive ? "var(--success-100)" : "var(--warning-100)",
+              color: rateIsLive ? "var(--success-600)" : "var(--warning-600)",
+            }}
+          >
+            <span className={`w-1.5 h-1.5 rounded-full ${rateIsLive ? "bg-green-500" : "bg-amber-500"}`} />
+            Exchange rate: NZD 1 = INR {liveRate.toFixed(2)} ({rateIsLive ? "live" : `data from ${rateDate}`})
           </div>
-
-          {/* Scenario buttons */}
-          {!isSinglePoint && (
-            <div>
-              <p className="text-xs font-medium mb-2" style={{ color: "var(--neutral-600)" }}>
-                Salary Scenario
-              </p>
-              <div className="flex gap-2">
-                {["min", "typical", "max"].map((point) => (
-                  <button
-                    key={point}
-                    onClick={() => setSalaryPoint(point as "min" | "typical" | "max")}
-                    className="px-4 py-2 text-xs font-medium rounded-full transition-all"
-                    style={{
-                      background: salaryPoint === point ? "var(--primary-900)" : "var(--neutral-100)",
-                      color: salaryPoint === point ? "white" : "var(--neutral-700)",
-                      border: salaryPoint === point ? "1px solid var(--primary-900)" : "1px solid transparent",
-                    }}
-                  >
-                    {point === "min" ? "Conservative" : point === "typical" ? "Typical" : "Optimistic"}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Salary amount display */}
-          <div className="mt-5 p-4 rounded-lg" style={{ background: "var(--primary-50)" }}>
-            <p className="text-xs font-medium mb-1" style={{ color: "var(--neutral-600)" }}>
-              Annual Gross Salary
-            </p>
-            <p className="text-3xl font-bold" style={{ color: "var(--primary-900)" }}>
-              {formatNzd(grossAnnual)}
-            </p>
-            <p className="text-sm mt-1" style={{ color: "var(--neutral-600)" }}>
-              {formatInr(grossAnnual * liveRate)} per year
-            </p>
-          </div>
+          <CurrencyToggle localLabel="NZD" displayCurrency={displayCurrency} onChange={setDisplayCurrency} />
         </div>
+        <p className="text-[10px] mt-1" style={{ color: "var(--neutral-400)" }}>
+          Rates change daily. All INR figures use this rate.
+        </p>
+
+        <SectionNav sections={SECTIONS} />
+
+        {/* Salary Selector */}
+        <div id="section-salary" className="space-y-6">
+        <SalarySelector
+          bands={data.salaryBands}
+          config={config}
+          selectedBand={selectedBand}
+          salaryPoint={salaryPoint}
+          onBandChange={setSelectedBand}
+          onSalaryPointChange={setSalaryPoint}
+          formatCurrency={displayFormat}
+          grossDisplayExtra={grossExtra}
+        />
 
         {/* IMG Earnings Note */}
         <div
@@ -297,253 +253,82 @@ export function NzResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
             <span className="font-semibold">Note:</span> IMGs have the opportunity to earn more by doing locums, on-calls, night-shifts, and overtime. The figures shown represent base salary only.
           </p>
         </div>
-
-        {/* ============ 2. TAX BREAKDOWN ============ */}
-        <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-          <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
-            2. Tax & Deductions
-          </h2>
-
-          <div className="space-y-2">
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm font-medium" style={{ color: "var(--neutral-900)" }}>
-                Gross Annual Salary
-              </span>
-              <span className="text-sm font-bold" style={{ color: "var(--primary-900)" }}>
-                {formatNzd(taxBreakdown.grossAnnual)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm" style={{ color: "var(--neutral-600)" }}>
-                Income Tax (PAYE)
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--warning-600)" }}>
-                -{formatNzd(taxBreakdown.incomeTax)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm" style={{ color: "var(--neutral-600)" }}>
-                ACC Earners' Levy
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--warning-600)" }}>
-                -{formatNzd(taxBreakdown.accLevy)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm" style={{ color: "var(--neutral-600)" }}>
-                KiwiSaver (3% employee)
-              </span>
-              <span className="text-sm font-medium" style={{ color: "var(--warning-600)" }}>
-                -{formatNzd(taxBreakdown.kiwisaver)}
-              </span>
-            </div>
-            <div className="h-px" style={{ background: "var(--neutral-200)" }} />
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm font-medium" style={{ color: "var(--neutral-900)" }}>
-                Total Deductions
-              </span>
-              <span className="text-sm font-bold" style={{ color: "var(--warning-600)" }}>
-                -{formatNzd(taxBreakdown.totalDeductions)}
-              </span>
-            </div>
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm font-medium" style={{ color: "var(--neutral-900)" }}>
-                Net Annual Salary
-              </span>
-              <span className="text-sm font-bold" style={{ color: "var(--success-600)" }}>
-                {formatNzd(taxBreakdown.netAnnual)}
-              </span>
-            </div>
-          </div>
-
-          <div className="mt-4 p-3 rounded-lg text-center" style={{ background: "var(--primary-50)" }}>
-            <p className="text-xs font-medium" style={{ color: "var(--primary-600)" }}>
-              Effective Tax Rate: {taxBreakdown.effectiveTaxRate}%
-            </p>
-          </div>
-
-          <div className="mt-3 text-xs p-3 rounded-lg" style={{ background: "var(--neutral-50)", color: "var(--neutral-600)" }}>
-            <p className="font-semibold mb-1">Note on KiwiSaver</p>
-            <p>
-              Employer contributes matching 3% (not deducted from your pay). Many doctors opt into KiwiSaver for
-              retirement savings. You can increase employee contribution to 4%, 6%, 8%, or 10% if desired.
-            </p>
-          </div>
         </div>
 
-        {/* ============ 3. TAKE-HOME PAY ============ */}
-        <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-          <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
-            3. Your Take-Home Pay
-          </h2>
-
-          <div className="grid sm:grid-cols-2 gap-4">
-            <div className="p-4 rounded-lg" style={{ background: "var(--primary-50)" }}>
-              <p className="text-xs font-medium mb-1" style={{ color: "var(--neutral-600)" }}>
-                Monthly (NZD)
-              </p>
-              <p className="text-2xl font-bold" style={{ color: "var(--primary-900)" }}>
-                {formatNzd(taxBreakdown.netMonthly)}
-              </p>
-            </div>
-            <div className="p-4 rounded-lg" style={{ background: "var(--accent-50)" }}>
-              <p className="text-xs font-medium mb-1" style={{ color: "var(--neutral-600)" }}>
-                Monthly (INR)
-              </p>
-              <p className="text-2xl font-bold" style={{ color: "var(--primary-900)" }}>
-                {formatInr(monthlyInr)}
-              </p>
-            </div>
-          </div>
+        {/* Tax Breakdown */}
+        <div id="section-tax">
+        <TaxBreakdownCard
+          title="2. Tax & Deductions"
+          rows={taxRows}
+          netAnnual={taxBreakdown.netAnnual}
+          grossAnnual={taxBreakdown.grossAnnual}
+          effectiveTaxRate={taxBreakdown.effectiveTaxRate}
+          donutSlices={donutSlices}
+          donutCenterValue={displayFormat(taxBreakdown.netAnnual)}
+          formatCurrency={displayFormat}
+          infoNotes={taxInfoNotes}
+        />
         </div>
 
-        {/* ============ 4. COST OF LIVING ============ */}
-        <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-          <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
-            4. Cost of Living
-          </h2>
-
-          <div className="space-y-4 mb-5">
-            <ChipSelect
-              label="City"
-              options={config.cities.map((city) => ({ value: city, label: city, icon: <MapPin size={14} /> }))}
-              selected={selectedCoL.city}
-              onChange={(city) => handleColChange(city, selectedCoL.lifestyleLevel, selectedCoL.rentType)}
-            />
-
-            <ChipSelect
-              label="Lifestyle"
-              options={config.lifestyleLevels.map((level) => ({ value: level, label: level, icon: LIFESTYLE_ICONS[level] }))}
-              selected={selectedCoL.lifestyleLevel}
-              onChange={(level) => handleColChange(selectedCoL.city, level as LifestyleLevel, selectedCoL.rentType)}
-              description={LIFESTYLE_DESCRIPTIONS[selectedCoL.lifestyleLevel]}
-            />
-
-            <ChipSelect
-              label="Accommodation"
-              options={config.rentTypes.map((type) => ({ value: type, label: type, icon: RENT_ICONS[type] }))}
-              selected={selectedCoL.rentType}
-              onChange={(rent) => handleColChange(selectedCoL.city, selectedCoL.lifestyleLevel, rent as RentType)}
-            />
-          </div>
-
-          {/* CoL Breakdown */}
-          <div className="space-y-2">
-            {colBreakdown.map((item, idx) => (
-              <div key={idx} className="flex justify-between items-center py-1.5">
-                <span className="text-sm" style={{ color: "var(--neutral-700)" }}>{item.label}</span>
-                <span className="text-sm font-medium" style={{ color: "var(--neutral-900)" }}>
-                  {formatNzd(item.value)}
-                </span>
-              </div>
-            ))}
-            <div className="h-px mt-2" style={{ background: "var(--neutral-200)" }} />
-            <div className="flex justify-between items-center py-2">
-              <span className="text-sm font-bold" style={{ color: "var(--neutral-900)" }}>
-                Total Monthly Cost
-              </span>
-              <span className="text-sm font-bold" style={{ color: "var(--primary-900)" }}>
-                {formatNzd(selectedCoL.totalMonthlyCost)}
-              </span>
-            </div>
-          </div>
+        {/* Take-Home Pay */}
+        <div id="section-takehome">
+        <TakeHomeCard
+          title="3. Your Take-Home Pay"
+          netMonthly={taxBreakdown.netMonthly}
+          netMonthlyInr={monthlyInr}
+          netAnnual={taxBreakdown.netAnnual}
+          totalDeductions={taxBreakdown.totalDeductions}
+          formatCurrency={displayFormat}
+          variant="grid"
+          currencyLabel="NZD"
+        />
         </div>
 
-        {/* ============ 5. SAVINGS ============ */}
-        <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
-          <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
-            5. Savings Potential
-          </h2>
-
-          <div className="grid sm:grid-cols-2 gap-4 mb-5">
-            <div>
-              <p className="text-xs font-medium mb-1" style={{ color: "var(--neutral-600)" }}>
-                Monthly Savings
-              </p>
-              <div className="flex items-baseline gap-2">
-                <p className={`text-3xl font-bold ${isNeg ? "text-red-600" : ""}`} style={{ color: isNeg ? undefined : "var(--success-600)" }}>
-                  {isNeg && <>-</>}
-                  {formatInr(Math.abs(savings.monthlySavingsInr))}
-                </p>
-                {isNeg ? (
-                  <TrendingDown size={20} className="text-red-600 mb-1" />
-                ) : (
-                  <TrendingUp size={20} style={{ color: "var(--success-600)" }} className="mb-1" />
-                )}
-              </div>
-              <p className="text-sm mt-0.5" style={{ color: "var(--neutral-600)" }}>
-                {formatNzd(Math.abs(savings.monthlySavingsNzd))} /month
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs font-medium mb-1" style={{ color: "var(--neutral-600)" }}>
-                Annual Savings Potential
-              </p>
-              <p className={`text-3xl font-bold ${isNeg ? "text-red-600" : ""}`} style={{ color: isNeg ? undefined : "var(--success-600)" }}>
-                {isNeg && <>-</>}
-                {formatInr(Math.abs(savings.monthlySavingsInr * 12))}
-              </p>
-              <p className="text-sm mt-0.5" style={{ color: "var(--neutral-600)" }}>
-                &#8377;{Math.round(Math.abs(savings.monthlySavingsInr * 12) / 100000)}L per year
-              </p>
-            </div>
-          </div>
-
-          {!isNeg && (
-            <div className="p-4 rounded-lg" style={{ background: "var(--primary-50)" }}>
-              <p className="text-xs font-medium mb-2" style={{ color: "var(--neutral-700)" }}>
-                Migration Cost Recovery Time
-              </p>
-              <div className="grid grid-cols-3 gap-3 text-center">
-                <div>
-                  <p className="text-xs" style={{ color: "var(--neutral-600)" }}>Conservative</p>
-                  <p className="text-lg font-bold mt-1" style={{ color: "var(--primary-900)" }}>
-                    {savings.recoveryMonthsMax >= 999 ? "N/A" : `${savings.recoveryMonthsMax}m`}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs" style={{ color: "var(--neutral-600)" }}>Typical</p>
-                  <p className="text-lg font-bold mt-1" style={{ color: "var(--primary-900)" }}>
-                    {savings.recoveryMonthsTypical >= 999 ? "N/A" : `${savings.recoveryMonthsTypical}m`}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-xs" style={{ color: "var(--neutral-600)" }}>Optimistic</p>
-                  <p className="text-lg font-bold mt-1" style={{ color: "var(--primary-900)" }}>
-                    {savings.recoveryMonthsMin >= 999 ? "N/A" : `${savings.recoveryMonthsMin}m`}
-                  </p>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {isNeg && (
-            <div className="p-4 rounded-lg" style={{ background: "var(--warning-50)", border: "1px solid var(--warning-200)" }}>
-              <p className="text-sm font-medium" style={{ color: "var(--warning-600)" }}>
-                Your selected cost of living exceeds your net salary. Consider adjusting your lifestyle or salary expectations.
-              </p>
-            </div>
-          )}
+        {/* Cost of Living */}
+        <div id="section-col">
+        <CostOfLivingSelector
+          title="4. Cost of Living"
+          rows={data.costOfLiving}
+          config={config}
+          selected={selectedCoL}
+          onChange={setSelectedCoL}
+          formatCurrency={displayFormat}
+          breakdownItems={colBreakdown}
+          lifestyleDescriptions={LIFESTYLE_DESCRIPTIONS}
+          netMonthly={taxBreakdown.netMonthly}
+        />
         </div>
 
-        {/* ============ 6. MIGRATION TIMELINE ============ */}
+        {/* Savings */}
+        <div id="section-savings">
+        <SavingsCard
+          monthlySavingsLocal={savings.monthlySavingsNzd}
+          monthlySavingsInr={savings.monthlySavingsInr}
+          monthlyTakeHomeLocal={savings.monthlyTakeHomeNzd}
+          monthlyCostLocal={savings.monthlyCostNzd}
+          isNegativeSavings={savings.isNegativeSavings}
+          formatCurrency={displayFormat}
+          variant="grid"
+          recoveryMonths={{
+            min: savings.recoveryMonthsMin,
+            typical: savings.recoveryMonthsTypical,
+            max: savings.recoveryMonthsMax,
+          }}
+        />
+        </div>
+
+        {/* Migration Timeline */}
+        <div id="section-migration">
         <MigrationTimelineCard savings={savings} migrationCosts={data.migrationCosts} />
+        </div>
 
-        {/* ============ 7. COUNTRY COMPARISON ============ */}
+        {/* Country Comparison */}
+        <div id="section-comparison">
         <CountryComparisonTable rows={comparisonRows} currentCountryCode="nz" />
+        </div>
 
         {/* Disclaimer */}
-        <div className="text-xs p-4 rounded-lg" style={{ background: "var(--neutral-100)", color: "var(--neutral-600)" }}>
-          <p className="font-semibold mb-1" style={{ color: "var(--neutral-700)" }}>
-            Disclaimer
-          </p>
-          <p>
-            This tool provides general estimates for planning purposes only. Actual salaries, costs, taxes, and migration timelines vary
-            significantly by DHB/hospital, city, specialty, NZREX exam results, and individual circumstances. Always consult official sources
-            (MCNZ, Immigration NZ, IRD) and financial advisors before making migration decisions.
-          </p>
-        </div>
+        <DisclaimerBanner />
       </div>
     </main>
   );

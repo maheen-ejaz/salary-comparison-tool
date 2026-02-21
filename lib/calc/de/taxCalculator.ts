@@ -201,6 +201,7 @@ export function formatEur(amount: number): string {
   return new Intl.NumberFormat("en-DE", {
     style: "currency",
     currency: "EUR",
+    currencyDisplay: "code",
     maximumFractionDigits: 0,
   }).format(amount);
 }
