@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { DM_Sans } from "next/font/google";
 import "./globals.css";
+import { SiteHeader } from "@/components/ui/site-header";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${dmSans.variable} scroll-smooth`}>
       <body className="font-[var(--font-dm-sans)] antialiased bg-[var(--background)] text-[var(--foreground)]">
+        <SiteHeader />
         {children}
       </body>
     </html>

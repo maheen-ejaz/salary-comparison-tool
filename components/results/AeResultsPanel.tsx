@@ -23,8 +23,7 @@ import { SectionNav } from "./SectionNav";
 import type { NavSection } from "./SectionNav";
 import { DonutChart } from "@/components/charts/DonutChart";
 import type { DonutSlice } from "@/components/charts/types";
-import Link from "next/link";
-import { ArrowLeft, Info, DollarSign } from "lucide-react";
+import { Info, DollarSign } from "lucide-react";
 import type { LifestyleLevel } from "@/lib/data/types";
 
 interface Props {
@@ -141,23 +140,6 @@ export function AeResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
 
   return (
     <main className="min-h-screen" style={{ background: "var(--neutral-50)" }}>
-      {/* Header */}
-      <header className="px-6 py-4 sticky top-0 z-10" style={{ background: "var(--primary-900)" }}>
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-white font-semibold text-sm">Salary Comparison Tool by</span>
-            <img src="/goocampus-logo-white.png" alt="GooCampus World" className="h-6" />
-          </div>
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-sm font-medium text-white bg-white/15 hover:bg-white/25 px-4 py-2 rounded-lg transition-colors"
-          >
-            <ArrowLeft size={18} />
-            Back to Home
-          </Link>
-        </div>
-      </header>
-
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         {/* Welcome */}
         <div>
