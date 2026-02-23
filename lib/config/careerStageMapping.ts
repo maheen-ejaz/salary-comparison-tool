@@ -22,11 +22,11 @@ export const CAREER_STAGE_MAP: Record<string, Record<string, string>> = {
     "Staff Physician": "consultant",
   },
   de: {
-    "Junior Resident \u2014 Assistenzarzt (Year 1-2)": "entry",
-    "Junior Resident \u2014 Assistenzarzt (Year 3-5)": "junior",
-    "Specialist (Facharzt)": "registrar",
-    "Senior Physician (Oberarzt)": "consultant",
-    "Chief Physician (Chefarzt)": "consultant",
+    "Assistenzarzt (Year 1-2)": "entry",
+    "Assistenzarzt (Year 3-5)": "junior",
+    "Facharzt (Specialist)": "registrar",
+    "Oberarzt (Senior Physician)": "consultant",
+    "Chefarzt (Chief Physician)": "consultant",
   },
   ae: {
     "House Officer / Junior Doctor": "entry",

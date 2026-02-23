@@ -30,10 +30,10 @@
   --primary-100: #F5F0E8;
   --primary-50:  #FFF8F0;
 
-  /* Accent — Orange */
-  --accent-600: #D4640A;
-  --accent-400: #F28C28;
-  --accent-100: #FFF3E0;
+  /* Accent — Emerald Green */
+  --accent-600: #059669;
+  --accent-400: #10B981;
+  --accent-100: #D1FAE5;
 
   /* Neutrals — Warm */
   --neutral-900: #1A1A2E;
@@ -56,7 +56,7 @@
   /* Design tokens */
   --card-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 6px 24px rgba(0,0,0,0.06);
   --card-shadow-hover: 0 4px 12px rgba(0,0,0,0.08), 0 12px 36px rgba(0,0,0,0.1);
-  --cta-gradient: linear-gradient(135deg, #F28C28 0%, #E8720C 100%);
+  --cta-gradient: linear-gradient(135deg, #10B981 0%, #059669 100%);
 
   --background: var(--neutral-50);
   --foreground: var(--neutral-900);
@@ -102,11 +102,11 @@ body {
   background: var(--cta-gradient);
   color: white;
   transition: all 0.2s ease;
-  box-shadow: 0 2px 8px rgba(242, 140, 40, 0.3);
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 .btn-cta:hover {
   transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(242, 140, 40, 0.4);
+  box-shadow: 0 4px 16px rgba(16, 185, 129, 0.4);
 }
 
 /* Card hover lift */

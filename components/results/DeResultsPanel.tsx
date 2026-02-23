@@ -46,7 +46,7 @@ const LIFESTYLE_DESCRIPTIONS: Record<LifestyleLevel, string> = {
 
 export function DeResultsPanel({ data, config, leadName, liveRate, rateIsLive, rateDate, allCountryData, allRates }: Props) {
   const defaultBand = data.salaryBands.find(
-    (b) => b.careerStage === "Junior Resident \u2014 Assistenzarzt (Year 1-2)" && b.sector === "Public (TV-Ärzte Collective Agreement)"
+    (b) => b.careerStage === "Assistenzarzt (Year 1-2)" && b.sector === "Public (TV-Ärzte)"
   )!;
   const defaultCoL = data.costOfLiving.find(
     (r) => r.city === "Berlin" && r.lifestyleLevel === "Basic" && r.rentType === "Shared Accommodation"
@@ -170,7 +170,7 @@ export function DeResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
     <div className="flex items-center gap-1.5 mt-2 text-xs" style={{ color: "var(--neutral-500)" }}>
       <Info size={11} />
       <span>
-        {selectedBand.sector === "Public (TV-Ärzte Collective Agreement)"
+        {selectedBand.sector === "Public (TV-Ärzte)"
           ? "Based on TV-Ärzte/VKA 2024-25 collective agreement (Tarifvertrag)."
           : "Based on market estimates for private hospital chains."}
       </span>

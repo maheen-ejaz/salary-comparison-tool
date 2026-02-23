@@ -143,8 +143,8 @@ export function calculateCaTakeHome(
 
   let grossFederalTax = computeMarginalTax(grossAnnual, federalRules);
 
-  // Apply non-refundable credits
-  const federalLowestRate = 0.15;
+  // Apply non-refundable credits (14% per Middle Class Tax Cut, effective 2025)
+  const federalLowestRate = 0.14;
   const bpaCredit = federalLowestRate * FEDERAL_BPA;
   const cppCredit = federalLowestRate * cppContribution;
   const eiCredit = federalLowestRate * eiContribution;

@@ -26,16 +26,7 @@ export function SiteHeader() {
     >
       <nav className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
         {/* Brand */}
-        <Link href="/" className="flex items-center gap-2">
-          <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center font-bold text-sm shrink-0"
-            style={{
-              background: "var(--accent-400)",
-              color: "var(--primary-900)",
-            }}
-          >
-            SC
-          </div>
+        <Link href="/" className="flex items-center">
           <span className="text-white font-semibold text-base tracking-tight">
             Salary Comparison Tool
           </span>

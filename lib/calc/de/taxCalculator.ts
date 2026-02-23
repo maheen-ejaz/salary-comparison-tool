@@ -32,34 +32,34 @@ export interface DeSavingsResult {
 }
 
 /**
- * German income tax per §32a EStG (2025 parameters).
+ * German income tax per §32a EStG (2025 parameters, Steuerfortentwicklungsgesetz).
  *
  * Germany uses a formula-based progressive system, NOT simple marginal brackets.
  * The tax is computed using linear-progressive formulas within zones:
- *   Zone 1: €0–€11,784        → 0 (Grundfreibetrag)
- *   Zone 2: €11,785–€17,005   → (979.18 × y + 1400) × y
- *   Zone 3: €17,006–€66,760   → (192.59 × z + 2397) × z + 966.53
- *   Zone 4: €66,761–€277,825  → 0.42 × zvE − 10,636.31
- *   Zone 5: €277,826+         → 0.45 × zvE − 18,971.06
+ *   Zone 1: €0–€12,096        → 0 (Grundfreibetrag, raised via Steuerfortentwicklungsgesetz)
+ *   Zone 2: €12,097–€17,005   → (922.98 × y + 1400) × y
+ *   Zone 3: €17,006–€66,760   → (181.19 × z + 2397) × z + 1025.38
+ *   Zone 4: €66,761–€277,825  → 0.42 × zvE − 10,602.13
+ *   Zone 5: €277,826+         → 0.45 × zvE − 18,936.88
  *
- * Parameters from BMF Programmablaufplan (PAP) 2025.
+ * Parameters from BMF Programmablaufplan (PAP) 2025 + Steuerfortentwicklungsgesetz (Dec 2024).
  */
 function computeGermanIncomeTax(zvE: number): number {
-  if (zvE <= 11784) {
+  if (zvE <= 12096) {
     return 0;
   }
   if (zvE <= 17005) {
-    const y = (zvE - 11784) / 10000;
-    return Math.floor((979.18 * y + 1400) * y);
+    const y = (zvE - 12096) / 10000;
+    return Math.floor((922.98 * y + 1400) * y);
   }
   if (zvE <= 66760) {
     const z = (zvE - 17005) / 10000;
-    return Math.floor((192.59 * z + 2397) * z + 966.53);
+    return Math.floor((181.19 * z + 2397) * z + 1025.38);
   }
   if (zvE <= 277825) {
-    return Math.floor(0.42 * zvE - 10636.31);
+    return Math.floor(0.42 * zvE - 10602.13);
   }
-  return Math.floor(0.45 * zvE - 18971.06);
+  return Math.floor(0.45 * zvE - 18936.88);
 }
 
 /**
