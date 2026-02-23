@@ -26,9 +26,15 @@ export function SiteHeader() {
     >
       <nav className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between px-4 sm:px-6">
         {/* Brand */}
-        <Link href="/" className="flex items-center">
-          <span className="text-white font-semibold text-base tracking-tight">
-            Salary Comparison Tool
+        <Link href="/" className="flex items-center gap-3">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm shrink-0"
+            style={{ background: "var(--accent-400)", color: "var(--primary-900)" }}
+          >
+            GC
+          </div>
+          <span className="text-white font-semibold text-base sm:text-lg tracking-tight">
+            Salary Comparison Tool by GooCampus World
           </span>
         </Link>
 

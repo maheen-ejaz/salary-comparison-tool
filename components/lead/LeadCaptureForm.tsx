@@ -10,8 +10,7 @@ export interface LeadData {
   phone: string;
   educationStatus: string;
 }
-import { ArrowLeft, ArrowRight } from "lucide-react";
-import Link from "next/link";
+import { ArrowRight } from "lucide-react";
 
 const schema = z.object({
   name: z.string().min(2, "Please enter your name"),
@@ -55,30 +54,6 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
 
   return (
     <main className="min-h-screen" style={{ background: "var(--neutral-50)" }}>
-      {/* Header */}
-      <header className="px-6 py-4" style={{ background: "var(--primary-900)" }}>
-        <div className="max-w-5xl mx-auto flex items-center justify-center relative">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-              style={{ background: "var(--accent-400)", color: "var(--primary-900)" }}
-            >
-              GC
-            </div>
-            <span className="text-white font-semibold text-lg tracking-tight">
-              Salary Comparison Tool by GooCampus World
-            </span>
-          </div>
-          <Link
-            href="/"
-            className="absolute right-0 flex items-center gap-2 text-sm font-medium text-white bg-white/15 hover:bg-white/25 px-4 py-2 rounded-lg transition-colors"
-          >
-            <ArrowLeft size={18} />
-            Back to Home
-          </Link>
-        </div>
-      </header>
-
       <div className="max-w-lg mx-auto px-6 py-16">
         {/* Country badge */}
         <div className="flex items-center gap-2 mb-8">
@@ -98,8 +73,12 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
 
         <form
           onSubmit={handleSubmit(onFormSubmit)}
-          className="rounded-2xl bg-white p-8 space-y-5"
-          style={{ border: "1px solid var(--neutral-200)", boxShadow: "0 1px 4px rgba(0,0,0,0.06)" }}
+          className="rounded-2xl p-8 space-y-5 backdrop-blur-xl"
+          style={{
+            background: "rgba(255, 255, 255, 0.5)",
+            border: "1px solid rgba(0, 0, 0, 0.06)",
+            boxShadow: "0 4px 24px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.8)",
+          }}
         >
           {/* Name */}
           <div>
@@ -113,7 +92,7 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
               className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all"
               style={{
                 border: `1.5px solid ${errors.name ? "var(--error-600)" : "var(--neutral-200)"}`,
-                background: "var(--neutral-50)",
+                background: "rgba(255, 255, 255, 0.6)",
                 color: "var(--neutral-900)",
               }}
             />
@@ -134,7 +113,7 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
               className="w-full px-4 py-3 rounded-lg text-sm outline-none transition-all"
               style={{
                 border: `1.5px solid ${errors.email ? "var(--error-600)" : "var(--neutral-200)"}`,
-                background: "var(--neutral-50)",
+                background: "rgba(255, 255, 255, 0.6)",
                 color: "var(--neutral-900)",
               }}
             />
@@ -152,8 +131,8 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
               <span
                 className="flex items-center px-3 rounded-lg text-sm font-medium"
                 style={{
-                  border: "1.5px solid var(--neutral-200)",
-                  background: "var(--neutral-100)",
+                  border: "1.5px solid rgba(0, 0, 0, 0.08)",
+                  background: "rgba(255, 255, 255, 0.4)",
                   color: "var(--neutral-600)",
                 }}
               >
@@ -186,7 +165,7 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
               className="w-full px-4 py-3 rounded-lg text-sm outline-none appearance-none"
               style={{
                 border: `1.5px solid ${errors.educationStatus ? "var(--error-600)" : "var(--neutral-200)"}`,
-                background: "var(--neutral-50)",
+                background: "rgba(255, 255, 255, 0.6)",
                 color: "var(--neutral-900)",
               }}
             >
