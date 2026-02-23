@@ -5,12 +5,12 @@ import { GlassDestinationCard } from "@/components/ui/glass-card-21";
 import { type GlassTheme, getTheme } from "@/lib/glass-theme";
 
 const COUNTRY_IMAGES: Record<string, string> = {
-  uk: "/countries/uk.jpeg",
-  au: "/countries/au.jpeg",
-  ca: "/countries/ca.jpeg",
-  ae: "/countries/ae.jpeg",
-  nz: "/countries/nz.png",
-  de: "/countries/de.jpeg",
+  uk: "/countries/uk.webp",
+  au: "/countries/au.webp",
+  ca: "/countries/ca.webp",
+  ae: "/countries/ae.webp",
+  nz: "/countries/nz.webp",
+  de: "/countries/de.webp",
 };
 
 export function GlassCountryCardsSection({ theme = "dark" }: { theme?: GlassTheme }) {

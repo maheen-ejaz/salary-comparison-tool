@@ -19,9 +19,32 @@ const DestinationCard = React.forwardRef<HTMLDivElement, DestinationCardProps>(
     { className, imageUrl, location, flag, stats, href, themeColor, ...props },
     ref
   ) => {
+    const cardRef = React.useRef<HTMLDivElement>(null);
+    const [isVisible, setIsVisible] = React.useState(false);
+
+    React.useEffect(() => {
+      const el = cardRef.current;
+      if (!el) return;
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observer.disconnect();
+          }
+        },
+        { rootMargin: "200px" }
+      );
+      observer.observe(el);
+      return () => observer.disconnect();
+    }, []);
+
     return (
       <div
-        ref={ref}
+        ref={(node) => {
+          (cardRef as React.MutableRefObject<HTMLDivElement | null>).current = node;
+          if (typeof ref === "function") ref(node);
+          else if (ref) (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+        }}
         style={
           {
             "--theme-color": themeColor,
@@ -40,11 +63,11 @@ const DestinationCard = React.forwardRef<HTMLDivElement, DestinationCardProps>(
             boxShadow: `0 0 40px -15px hsl(var(--theme-color) / 0.5)`,
           }}
         >
-          {/* Background Image with Parallax Zoom */}
+          {/* Background Image with Parallax Zoom — lazy loaded */}
           <div
             className="absolute inset-0 bg-cover bg-center
                        transition-transform duration-500 ease-in-out group-hover:scale-110"
-            style={{ backgroundImage: `url(${imageUrl})` }}
+            style={isVisible ? { backgroundImage: `url(${imageUrl})` } : undefined}
           />
 
           {/* Themed Gradient Overlay */}

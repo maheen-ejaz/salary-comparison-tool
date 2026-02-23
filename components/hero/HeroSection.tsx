@@ -4,12 +4,12 @@ import { useState, useEffect, useCallback } from "react";
 import { ArrowRight } from "lucide-react";
 
 const IMAGES = [
-  "/hero/uk.png",
-  "/hero/australia.jpeg",
-  "/hero/canada.jpeg",
-  "/hero/germany.png",
-  "/hero/nz.jpeg",
-  "/hero/uae.jpeg",
+  "/hero/uk.webp",
+  "/hero/australia.webp",
+  "/hero/canada.webp",
+  "/hero/germany.webp",
+  "/hero/nz.webp",
+  "/hero/uae.webp",
 ];
 
 const CYCLE_DURATION = 6000;
@@ -44,12 +44,17 @@ export function HeroSection() {
     return () => clearTimeout(fadeTimer);
   }, [isTransitioning]);
 
-  // Preload all images
+  // Preload first image immediately, defer the rest
   useEffect(() => {
-    IMAGES.forEach((src) => {
-      const img = new window.Image();
-      img.src = src;
-    });
+    const first = new window.Image();
+    first.src = IMAGES[0];
+    const timer = setTimeout(() => {
+      IMAGES.slice(1).forEach((src) => {
+        const img = new window.Image();
+        img.src = src;
+      });
+    }, 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   // Resync on tab visibility change

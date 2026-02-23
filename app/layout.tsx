@@ -21,6 +21,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${GeistSans.variable} scroll-smooth`}>
+      <head>
+        <link rel="preload" href="/hero/uk.webp" as="image" type="image/webp" />
+      </head>
       <body className="font-[family-name:var(--font-geist-sans)] antialiased bg-[var(--background)] text-[var(--foreground)]">
         <SiteHeader />
         {children}

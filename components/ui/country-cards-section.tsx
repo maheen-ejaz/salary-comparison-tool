@@ -2,12 +2,12 @@ import { COUNTRIES } from "@/lib/config/countries";
 import { DestinationCard } from "@/components/ui/card-21";
 
 const COUNTRY_IMAGES: Record<string, string> = {
-  uk: "/countries/uk.jpeg",
-  au: "/countries/au.jpeg",
-  ca: "/countries/ca.jpeg",
-  ae: "/countries/ae.jpeg",
-  nz: "/countries/nz.png",
-  de: "/countries/de.jpeg",
+  uk: "/countries/uk.webp",
+  au: "/countries/au.webp",
+  ca: "/countries/ca.webp",
+  ae: "/countries/ae.webp",
+  nz: "/countries/nz.webp",
+  de: "/countries/de.webp",
 };
 
 const COUNTRY_THEME_COLORS: Record<string, string> = {
