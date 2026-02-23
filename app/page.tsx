@@ -1,7 +1,7 @@
 import { Banknote, BarChart3, Home, BadgeIndianRupee, Timer, Globe } from "lucide-react";
 import { HeroSection } from "@/components/hero/HeroSection";
-import { CountryCardsSection } from "@/components/ui/country-cards-section";
-import { FeaturesSectionWithHoverEffects, type Feature } from "@/components/ui/feature-section-with-hover-effects";
+import { GlassCountryCardsSection } from "@/components/ui/glass-country-cards-section";
+import { GlassFeaturesSection, type Feature } from "@/components/ui/glass-features-section";
 import { FooterSection } from "@/components/ui/footer-section";
 
 const features: Feature[] = [
@@ -45,29 +45,12 @@ export default function LandingPage() {
       <HeroSection />
 
       {/* Country cards */}
-      <CountryCardsSection />
+      <GlassCountryCardsSection theme="light" />
 
       {/* Features */}
-      <section id="features" className="py-20 md:py-24 px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
-            <span className="section-label">What You Get</span>
-            <h2
-              className="text-3xl md:text-4xl font-bold mt-4 mb-4"
-              style={{ color: "var(--primary-900)" }}
-            >
-              What you&apos;ll see for each country
-            </h2>
-            <p
-              className="text-lg max-w-2xl mx-auto"
-              style={{ color: "var(--neutral-600)" }}
-            >
-              Detailed breakdowns to help you make an informed decision about your career abroad.
-            </p>
-          </div>
-          <FeaturesSectionWithHoverEffects features={features} />
-        </div>
-      </section>
+      <div id="features">
+        <GlassFeaturesSection features={features} theme="light" />
+      </div>
 
       {/* Footer */}
       <FooterSection />

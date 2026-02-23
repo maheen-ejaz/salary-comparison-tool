@@ -65,7 +65,7 @@ export function HeroSection() {
   }, [advance]);
 
   return (
-    <section className="relative w-full overflow-hidden" style={{ height: "100dvh" }}>
+    <section className="relative w-full overflow-hidden snap-start" style={{ height: "100dvh" }}>
       {/* Background images */}
       <div className="absolute inset-0">
         {/* Previous image (fading out) */}
@@ -90,7 +90,7 @@ export function HeroSection() {
             backgroundImage: `url(${IMAGES[currentIndex]})`,
             backgroundSize: "cover",
             backgroundPosition: "center",
-            animation: `kenburns ${CYCLE_DURATION}ms ease-in-out forwards, hero-fade-in ${FADE_DURATION}ms ease-out forwards`,
+            animation: `${currentIndex % 2 === 0 ? 'kenburns-in' : 'kenburns-out'} ${CYCLE_DURATION}ms ease-in-out forwards, hero-fade-in ${FADE_DURATION}ms ease-out forwards`,
             willChange: "transform, opacity",
           }}
         />
@@ -103,20 +103,22 @@ export function HeroSection() {
       <div className="relative z-[3] h-full flex flex-col px-6">
         {/* Centered hero content */}
         <div className="flex-1 flex flex-col items-center justify-center text-center max-w-3xl mx-auto">
-          <span className="inline-block text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-6 bg-white/15 text-white backdrop-blur-sm">
-            Free Tool &middot; No Subscription Required
-          </span>
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-5 leading-tight text-white drop-shadow-lg">
-            How much can you save
-            <br className="hidden md:block" /> as an Indian doctor abroad?
-          </h1>
-          <p className="text-lg md:text-xl max-w-2xl mx-auto mb-10 text-white/85">
-            See your real take-home pay after tax, cost of living, and exactly
-            how long it takes to recover migration costs.
-          </p>
-          <a href="#countries" className="btn-cta">
-            Explore Countries <ArrowRight size={18} />
-          </a>
+          <div className="bg-white/10 border border-white/20 backdrop-blur-md rounded-3xl px-8 py-12 md:px-12 md:py-16 flex flex-col items-center">
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest px-3 py-1 rounded-full mb-6 bg-white/15 text-white backdrop-blur-sm">
+              Free Tool &middot; No Subscription Required
+            </span>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-5 leading-[1.05] tracking-tight text-white drop-shadow-lg">
+              How much can you save
+              <br className="hidden md:block" /> as an Indian doctor abroad?
+            </h1>
+            <p className="text-lg md:text-xl leading-snug max-w-2xl mx-auto mb-10 text-white/85">
+              See your real take-home pay after tax, cost of living, and exactly
+              how long it takes to recover migration costs.
+            </p>
+            <a href="#countries" className="btn-cta">
+              Explore Countries <ArrowRight size={18} />
+            </a>
+          </div>
         </div>
 
         {/* Bottom spacer */}

@@ -61,8 +61,8 @@ export function SectionNav({ sections }: Props) {
 
   return (
     <div
-      className="sticky z-[9] -mx-4 sm:-mx-6 px-4 sm:px-6 py-2"
-      style={{ top: 56, background: "var(--neutral-50)", borderBottom: "1px solid var(--neutral-200)" }}
+      className="sticky z-[9] -mx-4 sm:-mx-6 px-4 sm:px-6 py-2 backdrop-blur-sm"
+      style={{ top: 56, background: "rgba(253, 251, 247, 0.85)", borderBottom: "1px solid var(--neutral-200)" }}
     >
       <div
         ref={navRef}

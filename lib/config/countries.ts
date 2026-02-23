@@ -26,7 +26,7 @@ export interface CountryConfig {
 export const COUNTRIES: CountryConfig[] = [
   {
     code: "uk",
-    name: "United Kingdom",
+    name: "UK",
     flag: "🇬🇧",
     currency: "GBP",
     currencySymbol: "GBP",

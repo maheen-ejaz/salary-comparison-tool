@@ -69,10 +69,10 @@ export function SiteHeader() {
               </button>
               <div className="invisible opacity-0 group-hover:visible group-hover:opacity-100 transition-all duration-150 absolute top-full right-0 pt-2">
                 <div
-                  className="rounded-lg border shadow-lg py-2 min-w-[200px]"
+                  className="rounded-lg border shadow-lg py-2 min-w-[200px] backdrop-blur-md"
                   style={{
-                    background: "var(--primary-900)",
-                    borderColor: "var(--neutral-700)",
+                    background: "rgba(26, 26, 46, 0.80)",
+                    borderColor: "rgba(255, 255, 255, 0.12)",
                   }}
                 >
                   {availableCountries.map((country) => (

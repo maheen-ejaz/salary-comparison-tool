@@ -1,13 +1,7 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { GeistSans } from "geist/font/sans";
 import "./globals.css";
 import { SiteHeader } from "@/components/ui/site-header";
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm-sans",
-  display: "swap",
-});
 
 export const metadata: Metadata = {
   title: "Salary Comparison Tool by GooCampus World",
@@ -26,8 +20,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${dmSans.variable} scroll-smooth`}>
-      <body className="font-[var(--font-dm-sans)] antialiased bg-[var(--background)] text-[var(--foreground)]">
+    <html lang="en" className={`${GeistSans.variable} scroll-smooth`}>
+      <body className="font-[family-name:var(--font-geist-sans)] antialiased bg-[var(--background)] text-[var(--foreground)]">
         <SiteHeader />
         {children}
       </body>

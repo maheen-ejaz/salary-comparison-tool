@@ -28,7 +28,7 @@ const socialLinks = [
 
 export function FooterSection() {
   return (
-    <footer className="px-6 py-12" style={{ background: "var(--primary-900)" }}>
+    <footer className="snap-start px-6 py-12" style={{ background: "var(--primary-900)" }}>
       <div className="max-w-6xl mx-auto">
         {/* Main 3-column grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 mb-10">
