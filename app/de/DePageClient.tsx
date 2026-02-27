@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { LeadCaptureForm, type LeadData } from "@/components/lead/LeadCaptureForm";
+import { getSavedLeadData } from "@/lib/lead-storage";
 import { DeResultsPanel } from "@/components/results/DeResultsPanel";
 import type { CountryData } from "@/lib/data/types";
 import type { CountryConfig } from "@/lib/config/countries";
@@ -26,8 +27,19 @@ export function DePageClient({ data, config, liveRate, rateIsLive, rateDate, all
   useEffect(() => {
     if (skipLeadForm && flowState === "form") {
       setFlowState("results");
+      return;
     }
-  }, [skipLeadForm, flowState]);
+    const saved = getSavedLeadData();
+    if (saved && flowState === "form") {
+      fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...saved, country: config.code }),
+      }).catch(() => {});
+      setLeadName(saved.name);
+      setFlowState("results");
+    }
+  }, [skipLeadForm, flowState, config.code]);
 
   const handleFormSubmit = (lead: LeadData) => {
     setLeadName(lead.name);

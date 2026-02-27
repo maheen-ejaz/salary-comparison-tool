@@ -43,7 +43,7 @@ interface Props {
 }
 
 export function CostOfLivingSelector({
-  title = "3. Cost of Living",
+  title = "3. Estimated Cost of Living",
   rows,
   config,
   selected,

@@ -3,6 +3,7 @@
 import { COUNTRIES } from "@/lib/config/countries";
 import { GlassDestinationCard } from "@/components/ui/glass-card-21";
 import { type GlassTheme, getTheme } from "@/lib/glass-theme";
+import { PageOrbs } from "@/components/ui/page-orbs";
 
 const COUNTRY_IMAGES: Record<string, string> = {
   uk: "/countries/uk.webp",
@@ -20,7 +21,17 @@ export function GlassCountryCardsSection({ theme = "dark" }: { theme?: GlassThem
   return (
     <section
       className="relative snap-start flex flex-col justify-center min-h-dvh py-16 px-6"
+      style={{
+        background: `
+          radial-gradient(ellipse 80% 50% at 20% 20%, rgba(13, 148, 136, 0.15) 0%, transparent 70%),
+          radial-gradient(ellipse 70% 50% at 80% 30%, rgba(37, 99, 235, 0.12) 0%, transparent 70%),
+          radial-gradient(ellipse 60% 40% at 50% 70%, rgba(6, 182, 212, 0.10) 0%, transparent 65%),
+          radial-gradient(ellipse 70% 45% at 30% 80%, rgba(5, 150, 105, 0.08) 0%, transparent 60%),
+          var(--neutral-50)
+        `,
+      }}
     >
+      <PageOrbs theme={theme} />
       <div id="countries" className="max-w-5xl mx-auto w-full scroll-mt-8 relative z-10">
         <div className="text-center mb-10">
           <p
@@ -48,49 +59,19 @@ export function GlassCountryCardsSection({ theme = "dark" }: { theme?: GlassThem
           {countries.map((country) => (
             <div
               key={country.code}
-              className="group/frame w-full max-w-[320px] h-[450px]"
+              className="w-full max-w-[340px]"
             >
-              {/* Glass frame */}
-              <GlassFrame theme={theme}>
-                <div className="w-full h-full rounded-xl overflow-hidden">
-                  <GlassDestinationCard
-                    imageUrl={COUNTRY_IMAGES[country.code]}
-                    location={country.name}
-                    flag={country.flag}
-                    href={`/${country.code}`}
-                    theme={theme}
-                    className="!rounded-xl"
-                  />
-                </div>
-              </GlassFrame>
+              <GlassDestinationCard
+                imageUrl={COUNTRY_IMAGES[country.code]}
+                location={country.name}
+                flag={country.flag}
+                href={`/${country.code}`}
+                theme={theme}
+              />
             </div>
           ))}
         </div>
       </div>
     </section>
-  );
-}
-
-function GlassFrame({ theme = "dark", children }: { theme?: GlassTheme; children: React.ReactNode }) {
-  const t = getTheme(theme);
-
-  return (
-    <div
-      className="w-full h-full rounded-2xl p-2.5 backdrop-blur-xl shadow-2xl transition-all duration-500"
-      style={{
-        background: t.cardBg,
-        border: `1px solid ${t.cardBorder}`,
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.background = t.cardBgHover;
-        e.currentTarget.style.borderColor = t.cardBorderHover;
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.background = t.cardBg;
-        e.currentTarget.style.borderColor = t.cardBorder;
-      }}
-    >
-      {children}
-    </div>
   );
 }

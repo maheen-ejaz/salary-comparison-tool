@@ -27,13 +27,13 @@ interface Props {
 }
 
 export function TaxBreakdownCard({
-  title = "2. Tax Breakdown",
+  title = "2. Estimated Tax Breakdown",
   rows,
   netAnnual,
   grossAnnual,
   effectiveTaxRate,
   donutSlices,
-  donutCenterLabel = "Take-Home",
+  donutCenterLabel = "Est. Take-Home",
   donutCenterValue,
   formatCurrency,
   warnings,

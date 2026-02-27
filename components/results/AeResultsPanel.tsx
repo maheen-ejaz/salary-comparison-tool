@@ -288,7 +288,7 @@ export function AeResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
         {/* Take-Home Pay */}
         <div id="section-takehome">
         <TakeHomeCard
-          title="3. Your Take-Home Pay"
+          title="3. Your Estimated Take-Home Pay"
           netMonthly={taxBreakdown.netMonthly}
           netMonthlyInr={monthlyInr}
           netAnnual={taxBreakdown.netAnnual}
@@ -302,7 +302,7 @@ export function AeResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
         {/* Cost of Living */}
         <div id="section-col">
         <CostOfLivingSelector
-          title="4. Cost of Living"
+          title="4. Estimated Cost of Living"
           rows={data.costOfLiving}
           config={config}
           selected={selectedCoL}

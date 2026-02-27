@@ -47,9 +47,9 @@ export function CountryComparisonTable({ rows, currentCountryCode }: Props) {
           <thead>
             <tr style={{ background: "var(--neutral-100)" }}>
               <th className="text-left px-6 py-3 font-medium" style={{ color: "var(--neutral-600)" }}>Country</th>
-              <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--neutral-600)" }}>Monthly Take-Home</th>
-              <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--neutral-600)" }}>Monthly Savings</th>
-              <th className="text-right px-6 py-3 font-medium" style={{ color: "var(--neutral-600)" }}>Break-Even</th>
+              <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--neutral-600)" }}>Est. Monthly Take-Home</th>
+              <th className="text-right px-4 py-3 font-medium" style={{ color: "var(--neutral-600)" }}>Est. Monthly Savings</th>
+              <th className="text-right px-6 py-3 font-medium" style={{ color: "var(--neutral-600)" }}>Est. Break-Even</th>
             </tr>
           </thead>
           <tbody>
@@ -199,13 +199,13 @@ export function CountryComparisonTable({ rows, currentCountryCode }: Props) {
             ) : (
               <div className="grid grid-cols-3 gap-2 text-center">
                 <div>
-                  <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--neutral-500)" }}>Take-Home</p>
+                  <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--neutral-500)" }}>Est. Take-Home</p>
                   <p className="text-sm font-bold tabular-nums" style={{ color: "var(--neutral-900)" }}>
                     {formatInrLakh(row.monthlyTakeHomeInr)}
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--neutral-500)" }}>Savings</p>
+                  <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--neutral-500)" }}>Est. Savings</p>
                   <p
                     className="text-sm font-bold tabular-nums"
                     style={{ color: row.isNegativeSavings ? "var(--error-600)" : "var(--success-600)" }}
@@ -214,7 +214,7 @@ export function CountryComparisonTable({ rows, currentCountryCode }: Props) {
                   </p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--neutral-500)" }}>Break-Even</p>
+                  <p className="text-[10px] font-medium mb-0.5" style={{ color: "var(--neutral-500)" }}>Est. Break-Even</p>
                   <p className="text-sm font-bold tabular-nums" style={{ color: "var(--primary-700)" }}>
                     {row.isNegativeSavings ? "N/A" : formatMonths(row.recoveryMonthsTypical)}
                   </p>

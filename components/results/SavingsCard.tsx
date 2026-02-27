@@ -5,7 +5,6 @@ import { formatInr, formatInrLakh } from "@/lib/calc/uk/taxCalculator";
 import { TrendingUp, TrendingDown } from "lucide-react";
 import { SavingsWaterfallChart } from "@/components/charts/SavingsWaterfallChart";
 
-const INDIAN_PG_MONTHLY_INR = 70000;
 
 interface Props {
   monthlySavingsLocal: number;
@@ -35,13 +34,13 @@ export function SavingsCard({
     return (
       <div className="rounded-2xl p-8 bg-white" style={{ border: "1px solid var(--neutral-200)" }}>
         <h2 className="text-lg font-bold mb-6" style={{ color: "var(--primary-900)" }}>
-          5. Savings Potential
+          5. Estimated Savings Potential
         </h2>
 
         <div className="grid sm:grid-cols-2 gap-4 mb-5">
           <div>
             <p className="text-xs font-medium mb-1" style={{ color: "var(--neutral-600)" }}>
-              Monthly Savings
+              Estimated Monthly Savings
             </p>
             <div className="flex items-baseline gap-2">
               <p className="text-3xl font-bold" style={{ color: isNeg ? "var(--error-600)" : "var(--success-600)" }}>
@@ -73,12 +72,6 @@ export function SavingsCard({
           </div>
         </div>
 
-        {!isNeg && (
-          <p className="text-xs text-center mb-4" style={{ color: "var(--neutral-500)" }}>
-            Equivalent to ~{Math.max(1, Math.round(Math.abs(monthlySavingsInr * 12) / INDIAN_PG_MONTHLY_INR))} months of an Indian PG stipend (INR 70,000/mo)
-          </p>
-        )}
-
         <SavingsWaterfallChart
           netMonthly={monthlyTakeHomeLocal}
           totalMonthlyCost={monthlyCostLocal}
@@ -90,7 +83,7 @@ export function SavingsCard({
         {!isNeg && recoveryMonths && (
           <div className="p-4 rounded-lg" style={{ background: "var(--primary-50)" }}>
             <p className="text-xs font-medium mb-2" style={{ color: "var(--neutral-700)" }}>
-              Migration Cost Recovery Time
+              Estimated Migration Cost Recovery Time
             </p>
             <div className="grid grid-cols-3 gap-3 text-center">
               <div>
@@ -137,7 +130,7 @@ export function SavingsCard({
     >
       <div className="flex items-start justify-between mb-2">
         <h2 className="text-lg font-bold" style={{ color: isNeg ? "var(--error-600)" : "var(--success-600)" }}>
-          Monthly Savings
+          Estimated Monthly Savings
         </h2>
         {isNeg ? (
           <TrendingDown size={20} style={{ color: "var(--error-600)" }} />
@@ -193,9 +186,6 @@ export function SavingsCard({
           </p>
           <p className="text-sm tabular-nums mt-0.5" style={{ color: "var(--neutral-600)" }}>
             {formatCurrency(Math.abs(monthlySavingsLocal * 12))}/year
-          </p>
-          <p className="text-xs mt-2" style={{ color: "var(--neutral-500)" }}>
-            Equivalent to ~{Math.max(1, Math.round(Math.abs(monthlySavingsInr * 12) / INDIAN_PG_MONTHLY_INR))} months of an Indian PG stipend (INR 70,000/mo)
           </p>
         </div>
       )}

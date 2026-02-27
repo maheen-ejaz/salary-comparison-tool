@@ -11,22 +11,22 @@ const features: Feature[] = [
     icon: <Banknote />,
   },
   {
-    title: "Full Tax Breakdown",
+    title: "Estimated Tax Breakdown",
     description: "Income Tax, National Insurance, and NHS Pension contributions",
     icon: <BarChart3 />,
   },
   {
-    title: "Cost of Living",
+    title: "Estimated Cost of Living",
     description: "Rent, transport, groceries by city, lifestyle, and accommodation type",
     icon: <Home />,
   },
   {
-    title: "Monthly Savings in INR",
-    description: "Real take-home minus expenses, converted to INR at live exchange rates",
+    title: "Estimated Monthly Savings in INR",
+    description: "Estimated take-home minus expenses, converted to INR at live exchange rates",
     icon: <BadgeIndianRupee />,
   },
   {
-    title: "Break-Even Timeline",
+    title: "Estimated Break-Even Timeline",
     description: "How long to recover PLAB/visa/exam costs from your monthly savings",
     icon: <Timer />,
   },

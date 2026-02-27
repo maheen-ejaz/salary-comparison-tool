@@ -1,15 +1,13 @@
 "use client";
 
+import { useRef } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { CountryConfig } from "@/lib/config/countries";
-export interface LeadData {
-  name: string;
-  email: string;
-  phone: string;
-  educationStatus: string;
-}
+import { saveLeadData } from "@/lib/lead-storage";
+import type { LeadData } from "@/lib/lead-storage";
+export type { LeadData };
 import { ArrowRight } from "lucide-react";
 
 const schema = z.object({
@@ -35,6 +33,7 @@ interface Props {
 }
 
 export function LeadCaptureForm({ config, onSubmit }: Props) {
+  const honeypotRef = useRef<HTMLInputElement>(null);
   const {
     register,
     handleSubmit,
@@ -46,9 +45,14 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
     fetch("/api/lead", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ ...values, country: config.code }),
+      body: JSON.stringify({
+        ...values,
+        country: config.code,
+        website: honeypotRef.current?.value || "",
+      }),
     }).catch(() => {});
 
+    saveLeadData(values);
     onSubmit(values);
   };
 
@@ -178,6 +182,17 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
               <p className="mt-1 text-xs" style={{ color: "var(--error-600)" }}>{errors.educationStatus.message}</p>
             )}
           </div>
+
+          {/* Honeypot — hidden from humans, catches bots */}
+          <input
+            ref={honeypotRef}
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+            aria-hidden="true"
+            className="absolute opacity-0 h-0 w-0 overflow-hidden pointer-events-none"
+          />
 
           {/* Submit */}
           <button

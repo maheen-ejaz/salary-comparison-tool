@@ -155,6 +155,20 @@ export function MigrationTimelineCard({ savings, migrationCosts }: Props) {
           </span>
         </div>
 
+        {/* Disclaimer */}
+        <p
+          className="text-xs italic px-4 py-2"
+          style={{
+            color: "var(--neutral-500)",
+            background: "var(--primary-50)",
+            borderTop: "1px solid var(--primary-100)",
+            margin: 0,
+          }}
+        >
+          Actual expenses may vary based on individual circumstances, attempt numbers,
+          travel choices, accommodation preferences, and province or region.
+        </p>
+
         {isOpen ? (
           /* ── EXPANDED: Full grouped view ── */
           <div>

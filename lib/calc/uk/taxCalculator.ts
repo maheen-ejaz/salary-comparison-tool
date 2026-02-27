@@ -26,21 +26,46 @@ const PA_FULLY_WITHDRAWN_AT = 125140;
 export function calculateUkTakeHome(input: TaxCalculationInput): TaxBreakdown {
   const { grossAnnual, taxRules, includeNhsPension } = input;
 
+  // --- NHS Pension (flat-tier — NOT marginal) ---
+  // Calculated FIRST because NHS uses a net pay arrangement: pension contributions
+  // are deducted before income tax, reducing both taxable income and the adjusted
+  // net income used for the Personal Allowance taper.
+  let nhsPension = 0;
+  let nhsPensionTierRate = 0;
+  if (includeNhsPension) {
+    const pensionRules = taxRules
+      .filter((r) => r.taxType === "NHS Pension")
+      .sort((a, b) => a.bracketLower - b.bracketLower);
+
+    const tier = pensionRules.find(
+      (r) => grossAnnual >= r.bracketLower && grossAnnual <= r.bracketUpper
+    );
+    if (tier) {
+      nhsPensionTierRate = tier.ratePercent;
+      nhsPension = grossAnnual * (tier.ratePercent / 100);
+    }
+  }
+
+  // Adjusted net income = gross minus pension (net pay arrangement).
+  // This is the figure used for PA taper and income tax calculation.
+  const adjustedNetIncome = grossAnnual - nhsPension;
+
   // --- Personal Allowance (may be reduced for high earners) ---
+  // PA taper is based on adjusted net income, not gross.
   let effectivePA = PA_FULL;
-  if (grossAnnual > PA_WITHDRAWAL_START) {
+  if (adjustedNetIncome > PA_WITHDRAWAL_START) {
     const excess = Math.min(
-      grossAnnual - PA_WITHDRAWAL_START,
+      adjustedNetIncome - PA_WITHDRAWAL_START,
       PA_FULLY_WITHDRAWN_AT - PA_WITHDRAWAL_START
     );
     effectivePA = Math.max(0, PA_FULL - Math.floor(excess / 2));
   }
   const isInPAWithdrawalZone =
-    grossAnnual > PA_WITHDRAWAL_START && grossAnnual <= PA_FULLY_WITHDRAWN_AT;
+    adjustedNetIncome > PA_WITHDRAWAL_START &&
+    adjustedNetIncome <= PA_FULLY_WITHDRAWN_AT;
 
   // --- Income Tax (marginal) ---
-  // Tax is calculated on gross income; the 0% band corresponds to the PA.
-  // We skip the 0% row and calculate tax on each bracket above PA.
+  // Tax is calculated on adjusted net income (gross minus pension).
   const itRules = taxRules
     .filter((r) => r.taxType === "Income Tax" && r.ratePercent > 0)
     .sort((a, b) => a.bracketLower - b.bracketLower);
@@ -50,14 +75,13 @@ export function calculateUkTakeHome(input: TaxCalculationInput): TaxBreakdown {
   // Re-compute bracket boundaries based on effectivePA
   // The basic rate bracket starts at (PA_FULL in CSV) but we use effectivePA.
   for (const rule of itRules) {
-    // For the basic rate band, shift the lower bound down by the PA reduction amount
-    // so that taxable income above effectivePA is captured correctly.
     const paReduction = PA_FULL - effectivePA;
     const adjustedLower = rule.bracketLower - paReduction;
     const adjustedUpper = rule.bracketUpper - paReduction;
 
     const taxableInThisBracket =
-      Math.min(grossAnnual, adjustedUpper) - Math.min(grossAnnual, adjustedLower);
+      Math.min(adjustedNetIncome, adjustedUpper) -
+      Math.min(adjustedNetIncome, adjustedLower);
 
     if (taxableInThisBracket > 0) {
       incomeTax += taxableInThisBracket * (rule.ratePercent / 100);
@@ -65,6 +89,7 @@ export function calculateUkTakeHome(input: TaxCalculationInput): TaxBreakdown {
   }
 
   // --- National Insurance (marginal) ---
+  // NI is calculated on gross earnings (pension does NOT reduce NI-able pay).
   const niRules = taxRules
     .filter((r) => r.taxType === "National Insurance" && r.ratePercent > 0)
     .sort((a, b) => a.bracketLower - b.bracketLower);
@@ -76,24 +101,6 @@ export function calculateUkTakeHome(input: TaxCalculationInput): TaxBreakdown {
       Math.min(grossAnnual, rule.bracketLower);
     if (niInBracket > 0) {
       nationalInsurance += niInBracket * (rule.ratePercent / 100);
-    }
-  }
-
-  // --- NHS Pension (flat-tier — NOT marginal) ---
-  let nhsPension = 0;
-  let nhsPensionTierRate = 0;
-  if (includeNhsPension) {
-    const pensionRules = taxRules
-      .filter((r) => r.taxType === "NHS Pension")
-      .sort((a, b) => a.bracketLower - b.bracketLower);
-
-    // Find the single tier that contains the gross salary
-    const tier = pensionRules.find(
-      (r) => grossAnnual >= r.bracketLower && grossAnnual <= r.bracketUpper
-    );
-    if (tier) {
-      nhsPensionTierRate = tier.ratePercent;
-      nhsPension = grossAnnual * (tier.ratePercent / 100);
     }
   }
 

@@ -23,7 +23,7 @@ interface Props {
 }
 
 export function TakeHomeCard({
-  title = "Monthly Take-Home",
+  title = "Estimated Monthly Take-Home",
   subtitle,
   netMonthly,
   netMonthlyInr,

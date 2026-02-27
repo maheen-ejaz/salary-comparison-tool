@@ -256,7 +256,7 @@ export function CaResultsPanel({ data, config, leadName, liveRate, rateIsLive, r
         <div id="section-tax">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <TaxBreakdownCard
-            title={`2. Tax Breakdown (${province})`}
+            title={`2. Estimated Tax Breakdown (${province})`}
             rows={taxRows}
             netAnnual={taxBreakdown.netAnnual}
             grossAnnual={taxBreakdown.grossAnnual}
