@@ -2,19 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 // ─── Validation ───────────────────────────────────────────────
-const leadSchema = z.object({
-  name: z.string().min(2).max(100),
-  email: z.string().email().max(254),
-  phone: z.string().min(7).max(20).regex(/^[\d\s\-+().]+$/),
-  educationStatus: z.enum([
-    "MBBS Completed",
-    "PG In Progress (MD/MS/DNB)",
-    "PG Completed (MD/MS/DNB)",
-    "Super-Specialty (DM/MCh/Fellowship)",
-    "Other",
-  ]),
-  country: z.string().min(2).max(3).regex(/^[a-z]+$/),
-  verified: z.boolean().optional(),
+const feedbackSchema = z.object({
+  country: z.string().min(1).max(100),
+  sentiment: z.enum(["Positive", "Neutral", "Negative"]),
 });
 
 // ─── CORS ─────────────────────────────────────────────────────
@@ -56,7 +46,6 @@ export async function POST(request: NextRequest) {
   const corsHeaders = getCorsHeaders(request);
 
   try {
-    // Content-type guard
     const contentType = request.headers.get("content-type");
     if (!contentType?.includes("application/json")) {
       return NextResponse.json(
@@ -65,7 +54,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Size guard (reject bodies over 2 KB)
     const contentLength = request.headers.get("content-length");
     if (contentLength && parseInt(contentLength, 10) > 2048) {
       return NextResponse.json(
@@ -74,15 +62,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Parse and validate
     const raw = await request.json();
-
-    // Honeypot: silently discard bot submissions
-    if (raw.website) {
-      return NextResponse.json({ success: true }, { headers: corsHeaders });
-    }
-
-    const result = leadSchema.safeParse(raw);
+    const result = feedbackSchema.safeParse(raw);
 
     if (!result.success) {
       return NextResponse.json(
@@ -95,34 +76,27 @@ export async function POST(request: NextRequest) {
 
     const webhookUrl = process.env.GOOGLE_SHEETS_WEBHOOK_URL;
     if (!webhookUrl) {
-      // Not configured — log without PII
-      console.warn("GOOGLE_SHEETS_WEBHOOK_URL is not set. Lead not saved.");
+      console.warn("GOOGLE_SHEETS_WEBHOOK_URL is not set. Feedback not saved.");
       return NextResponse.json({ success: true }, { headers: corsHeaders });
     }
 
-    // Forward validated fields only (no spread to prevent extra field injection)
     const webhookRes = await fetch(webhookUrl, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        name: body.name,
-        email: body.email,
-        phone: body.phone,
-        educationStatus: body.educationStatus,
         country: body.country,
-        phoneVerified: body.verified ?? false,
-        source: "gcworld-salary-tool",
+        sentiment: body.sentiment,
+        source: "gcworld-salary-tool-survey",
       }),
     });
 
     if (!webhookRes.ok) {
-      console.warn(`Webhook returned status ${webhookRes.status}`);
+      console.warn(`Feedback webhook returned status ${webhookRes.status}`);
     }
 
     return NextResponse.json({ success: true }, { headers: corsHeaders });
   } catch {
-    // Silently succeed — the user should see results even if lead capture fails
-    console.error("Lead capture: unexpected error");
+    console.error("Feedback capture: unexpected error");
     return NextResponse.json({ success: true }, { headers: corsHeaders });
   }
 }

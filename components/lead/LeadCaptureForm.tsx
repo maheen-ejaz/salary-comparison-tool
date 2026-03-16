@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import type { CountryConfig } from "@/lib/config/countries";
-import { saveLeadData } from "@/lib/lead-storage";
 import type { LeadData } from "@/lib/lead-storage";
 export type { LeadData };
 import { ArrowRight } from "lucide-react";
@@ -13,7 +12,7 @@ import { ArrowRight } from "lucide-react";
 const schema = z.object({
   name: z.string().min(2, "Please enter your name"),
   email: z.string().email("Please enter a valid email"),
-  phone: z.string().min(7, "Please enter a valid phone number"),
+  phone: z.string().regex(/^\d{10}$/, "Please enter a 10-digit mobile number"),
   educationStatus: z.string().min(1, "Please select your education status"),
 });
 
@@ -34,6 +33,7 @@ interface Props {
 
 export function LeadCaptureForm({ config, onSubmit }: Props) {
   const honeypotRef = useRef<HTMLInputElement>(null);
+  const [serverError, setServerError] = useState("");
   const {
     register,
     handleSubmit,
@@ -41,19 +41,34 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
   } = useForm<FormValues>({ resolver: zodResolver(schema) });
 
   const onFormSubmit = async (values: FormValues) => {
-    // Fire-and-forget — never block the user on webhook success
-    fetch("/api/lead", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        ...values,
-        country: config.code,
-        website: honeypotRef.current?.value || "",
-      }),
-    }).catch(() => {});
+    setServerError("");
 
-    saveLeadData(values);
-    onSubmit(values);
+    // Honeypot check — silently proceed for bots (they won't get a real OTP)
+    const honeypotValue = honeypotRef.current?.value || "";
+
+    try {
+      const res = await fetch("/api/otp/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          phone: values.phone,
+          email: values.email,
+          website: honeypotValue,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setServerError(data.error || "Failed to send OTP. Please try again.");
+        return;
+      }
+
+      // OTP sent successfully — advance to OTP screen
+      onSubmit(values);
+    } catch {
+      setServerError("Something went wrong. Please try again.");
+    }
   };
 
   return (
@@ -154,8 +169,12 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
                 }}
               />
             </div>
-            {errors.phone && (
+            {errors.phone ? (
               <p className="mt-1 text-xs" style={{ color: "var(--error-600)" }}>{errors.phone.message}</p>
+            ) : (
+              <p className="mt-1 text-xs" style={{ color: "var(--neutral-500)" }}>
+                We&apos;ll send an OTP to verify this number
+              </p>
             )}
           </div>
 
@@ -194,6 +213,13 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
             className="absolute opacity-0 h-0 w-0 overflow-hidden pointer-events-none"
           />
 
+          {/* Server error */}
+          {serverError && (
+            <p className="text-sm text-center" style={{ color: "var(--error-600)" }}>
+              {serverError}
+            </p>
+          )}
+
           {/* Submit */}
           <button
             type="submit"
@@ -201,9 +227,9 @@ export function LeadCaptureForm({ config, onSubmit }: Props) {
             className="w-full flex items-center justify-center gap-2 py-3.5 rounded-xl font-semibold text-white transition-all disabled:opacity-60"
             style={{ background: "var(--primary-700)" }}
           >
-            {isSubmitting ? "Processing..." : (
+            {isSubmitting ? "Sending OTP..." : (
               <>
-                See My {config.name} Salary Breakdown
+                Verify & See Results
                 <ArrowRight size={16} />
               </>
             )}

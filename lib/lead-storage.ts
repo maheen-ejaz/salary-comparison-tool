@@ -36,3 +36,50 @@ export function getSavedLeadData(): LeadData | null {
     return null;
   }
 }
+
+// ─── Visited countries tracking ──────────────────────────────
+const VISITED_KEY = "salaryTool_visitedCountries";
+const FEEDBACK_KEY = "salaryTool_feedbackGiven";
+
+export function saveVisitedCountry(code: string): void {
+  try {
+    const visited = getVisitedCountries();
+    if (!visited.includes(code)) {
+      visited.push(code);
+      sessionStorage.setItem(VISITED_KEY, JSON.stringify(visited));
+    }
+  } catch {
+    // Silently fail
+  }
+}
+
+export function getVisitedCountries(): string[] {
+  try {
+    const raw = sessionStorage.getItem(VISITED_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    if (Array.isArray(parsed) && parsed.every((v) => typeof v === "string")) {
+      return parsed;
+    }
+    sessionStorage.removeItem(VISITED_KEY);
+    return [];
+  } catch {
+    return [];
+  }
+}
+
+export function hasFeedbackBeenGiven(): boolean {
+  try {
+    return sessionStorage.getItem(FEEDBACK_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+export function markFeedbackGiven(): void {
+  try {
+    sessionStorage.setItem(FEEDBACK_KEY, "true");
+  } catch {
+    // Silently fail
+  }
+}
