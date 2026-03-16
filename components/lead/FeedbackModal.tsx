@@ -34,7 +34,7 @@ export function FeedbackModal({ countryName, onComplete }: Props) {
           sentiment: selected,
           ...(() => {
             const lead = getSavedLeadData();
-            return lead ? { name: lead.name, email: lead.email, phone: lead.phone } : {};
+            return lead ? { name: lead.name, email: lead.email, phone: lead.phone, educationStatus: lead.educationStatus } : {};
           })(),
         }),
       });

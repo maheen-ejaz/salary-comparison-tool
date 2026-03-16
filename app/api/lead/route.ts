@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
         phone: body.phone,
         educationStatus: body.educationStatus,
         country: body.country,
-        phoneVerified: body.verified ?? false,
+        sentiment: "",
         source: "gcworld-salary-tool",
       }),
     });

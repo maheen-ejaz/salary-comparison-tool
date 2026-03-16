@@ -8,6 +8,7 @@ const feedbackSchema = z.object({
   name: z.string().max(100).optional(),
   email: z.string().email().max(254).optional(),
   phone: z.string().max(20).optional(),
+  educationStatus: z.string().max(100).optional(),
 });
 
 // ─── CORS ─────────────────────────────────────────────────────
@@ -90,9 +91,10 @@ export async function POST(request: NextRequest) {
         name: body.name || "",
         email: body.email || "",
         phone: body.phone || "",
+        educationStatus: body.educationStatus || "",
         country: body.country,
         sentiment: body.sentiment,
-        source: "gcworld-salary-tool-survey",
+        source: "gcworld-salary-tool",
       }),
     });
 
