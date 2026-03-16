@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ThumbsUp, Minus, ThumbsDown, Send } from "lucide-react";
+import { getSavedLeadData } from "@/lib/lead-storage";
 
 const SENTIMENTS = [
   { value: "Positive", label: "Positive", icon: ThumbsUp, color: "var(--success-600, #16a34a)" },
@@ -28,7 +29,14 @@ export function FeedbackModal({ countryName, onComplete }: Props) {
       const res = await fetch("/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ country: countryName, sentiment: selected }),
+        body: JSON.stringify({
+          country: countryName,
+          sentiment: selected,
+          ...(() => {
+            const lead = getSavedLeadData();
+            return lead ? { name: lead.name, email: lead.email, phone: lead.phone } : {};
+          })(),
+        }),
       });
 
       if (!res.ok) {

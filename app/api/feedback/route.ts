@@ -5,6 +5,9 @@ import { z } from "zod";
 const feedbackSchema = z.object({
   country: z.string().min(1).max(100),
   sentiment: z.enum(["Positive", "Neutral", "Negative"]),
+  name: z.string().max(100).optional(),
+  email: z.string().email().max(254).optional(),
+  phone: z.string().max(20).optional(),
 });
 
 // ─── CORS ─────────────────────────────────────────────────────
@@ -84,6 +87,9 @@ export async function POST(request: NextRequest) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        name: body.name || "",
+        email: body.email || "",
+        phone: body.phone || "",
         country: body.country,
         sentiment: body.sentiment,
         source: "gcworld-salary-tool-survey",
